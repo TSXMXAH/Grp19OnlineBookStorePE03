@@ -1,0 +1,40 @@
+﻿@page "/books"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Grp19OnlineBookStorePE03.Classes
+@using Grp19OnlineBookStorePE03.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<Grp19OnlineBookStorePE03.Data.Grp19OnlineBookStorePE03Context> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="books/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Book">
+    <PropertyColumn Property="book => book.StaffId" />
+    <PropertyColumn Property="book => book.Category" />
+    <PropertyColumn Property="book => book.Price" />
+    <PropertyColumn Property="book => book.Author" />
+    <PropertyColumn Property="book => book.BookName" />
+
+    <TemplateColumn Context="book">
+        <a href="@($"books/edit?bookid={book.BookId}")">Edit</a> |
+        <a href="@($"books/details?bookid={book.BookId}")">Details</a> |
+        <a href="@($"books/delete?bookid={book.BookId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private Grp19OnlineBookStorePE03Context context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}
