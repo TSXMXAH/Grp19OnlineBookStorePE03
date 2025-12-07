@@ -1,7 +1,158 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Store</title>
 
-<h1>Hello, world!</h1>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+        }
 
-Welcome to your new app.
+        /* NAVBAR */
+        .navbar {
+            background: red;
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            color: white;
+            font-weight: bold;
+        }
+
+       .nav-left, .nav-right {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-item {
+            cursor: pointer;
+        }
+
+        /* BOOK LIST */
+        .book-list {
+            width: 90%;
+            margin: 40px auto;
+        }
+
+        .book-item {
+            display: flex;
+            justify-content: space-between;
+            background: white;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+
+        .book-cover {
+            width: 150px;
+            height: 200px;
+            background: #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .book-info {
+            width: 60%;
+            line-height: 1.6;
+        }
+
+        .book-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            background: red;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            width: 150px;
+            border-radius: 5px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    @*Book List*@
+    <div class="book-list">
+
+        @*Book 1*@
+        <div class="book-item">
+            <div class="book-cover">Book Cover<br>here</div>
+
+            <div class="book-info">
+                <strong>Book Title: How To Dig a Hole</strong><br>
+                Author: Dwarf A<br><br>
+
+                Synopsis: This book explores Dwarf A's methods on digging holes.<br><br>
+
+                <strong>Price: $20</strong>
+            </div>
+
+            <div class="book-buttons">
+                <button class="btn">ADD TO CART</button>
+                <button class="btn">WISHLIST</button>
+                <button class="btn">REVIEW</button>
+            </div>
+        </div>
+
+        @*Book 2*@
+        <div class="book-item">
+            <div class="book-cover">Book Cover<br>here</div>
+
+            <div class="book-info">
+                <strong>Book Title: How NOT To Dig a Hole</strong><br>
+                Author: Dwarf A<br><br>
+
+                Synopsis: This book explores Dwarf A's methods on how NOT to dig a hole.<br><br>
+
+                <strong>Price: $20</strong>
+            </div>
+
+            <div class="book-buttons">
+                <button class="btn">ADD TO CART</button>
+                <button class="btn">WISHLIST</button>
+                <button class="btn">REVIEW</button>
+            </div>
+        </div>
+
+        @*Book 3*@
+        <div class="book-item">
+            <div class="book-cover">Book Cover<br>here</div>
+
+            <div class="book-info">
+                <strong>Book Title: How To Build a Particle Accelerator</strong><br>
+                Author: Dwarf A<br><br>
+
+                Synopsis: This book explores how Dwarf A builds his particle accelerators in the hole he dug.<br><br>
+
+                <strong>Price: $3</strong>
+            </div>
+
+            <div class="book-buttons">
+                <button class="btn">ADD TO CART</button>
+                <button class="btn">WISHLIST</button>
+                <button class="btn">REVIEW</button>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

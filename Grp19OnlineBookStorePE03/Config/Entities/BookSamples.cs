@@ -11,8 +11,7 @@ namespace Grp19OnlineBookStorePE03.Config.Entities
             builder.HasData(
                 new Book
                 {
-                    BookId = 1,
-                    StaffId = 1,
+                    Id = 1,
                     Category = "Romance",
                     Price = 17.20M,
                     Author = "Holly Black",
@@ -20,8 +19,7 @@ namespace Grp19OnlineBookStorePE03.Config.Entities
                 },
                 new Book
                 {
-                    BookId = 2,
-                    StaffId = 1,
+                    Id = 2,
                     Category = "Romance",
                     Price = 18.50M,
                     Author = "Holly Black",
@@ -29,8 +27,7 @@ namespace Grp19OnlineBookStorePE03.Config.Entities
                 },
                 new Book
                 {
-                    BookId = 3,
-                    StaffId = 1,
+                    Id = 3,
                     Category = "Romance",
                     Price = 16.50M,
                     Author = "Holly Black",

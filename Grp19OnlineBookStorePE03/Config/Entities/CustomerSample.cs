@@ -11,7 +11,7 @@ namespace Grp19OnlineBookStorePE03.Config.Entities
             builder.HasData(
                 new Customer
                 {
-                    CustomerId = 1,
+                    Id = 1,
                     Name = "Sarah",
                     Address = "676 Tampines Drive, Stree 41",
                     ContactNum = "86605947"

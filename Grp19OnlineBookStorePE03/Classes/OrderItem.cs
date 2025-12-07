@@ -1,8 +1,7 @@
 ﻿namespace Grp19OnlineBookStorePE03.Classes
 {
-    public class OrderItem
+    public class OrderItem : Inheritance
     {
-        public int OrderItemId { get; set; } //PK
         public int? OrderId { get; set; } //FK
         public Order? Order { get; set; } //Nav_Link_In (Order has>)
         public int? BookId { get; set; } //FK

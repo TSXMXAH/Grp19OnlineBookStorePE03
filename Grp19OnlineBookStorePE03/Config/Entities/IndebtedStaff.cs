@@ -11,14 +11,14 @@ namespace Grp19OnlineBookStorePE03.Config.Entities
                 builder.HasData(
                     new Staff
                     {
-                        StaffId = 1,
+                        Id = 1,
                         Name = "BookStaff",
                         Password = "123",
                         
                     },
                     new Staff
                     {
-                        StaffId = 2,
+                        Id = 2,
                         Name = "MiscStaff",
                         Password = "321",
                      

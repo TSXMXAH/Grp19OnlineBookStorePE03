@@ -1,0 +1,93 @@
+﻿@page "/Login"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #e5e5e5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .box {
+            width: 350px;
+            background: #dcdcdc;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #bbb;
+            border: none;
+            font-weight: bold;
+        }
+
+        .checkbox-row {
+            text-align: left;
+            margin: 10px 0 20px 0;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: red;
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 15px 0;
+        }
+
+        .links {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div class="box">
+        <h2>LOGIN</h2>
+
+        <input type="email" placeholder="EMAIL">
+        <input type="password" placeholder="PASSWORD">
+
+        <div class="checkbox-row">
+            <input type="checkbox"> Remember me
+        </div>
+
+        <button>LOGIN</button>
+
+        <div class="links">
+            <a href="register">Don't have an account?</a>
+
+            <a href="#">Forgot Password?</a>
+        </div>
+    </div>
+
+</body>
+</html>
+

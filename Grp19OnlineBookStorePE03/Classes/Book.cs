@@ -1,10 +1,7 @@
 ﻿namespace Grp19OnlineBookStorePE03.Classes
 {
-    public class Book
+    public class Book : Inheritance
     {
-        public int BookId {  get; set; } //PK
-        public int StaffId { get; set; } //FK
-        public Staff? Staff { get; set; } //Nav_Link_In ( handles > Book )
         public string? Category {  get; set; }
         public decimal Price { get; set; }
         public string? Author { get; set; }

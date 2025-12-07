@@ -11,16 +11,14 @@ namespace Grp19OnlineBookStorePE03.Config.Entities
                 builder.HasData(
                     new Misc
                     {
-                        MiscId = 1,
-                        StaffId = 2,
+                        Id = 1,
                         Category = "Stationary",
                         Price = 450,
                         MiscName = " PIX Black Ballpoint Pen"
                     },
                     new Misc
                     {
-                        MiscId = 2,
-                        StaffId = 2,
+                        Id = 2,
                         Category = "Office Supplies",
                         Price = 33.00M,
                         MiscName = "Canon Original Black Cartridge"
@@ -28,8 +26,7 @@ namespace Grp19OnlineBookStorePE03.Config.Entities
                     },
                     new Misc
                     {
-                        MiscId = 3,
-                        StaffId = 2,
+                        Id = 3,
                         Category = "Wellness",
                         Price = 67.50M,
                         MiscName = "Hitachi HMG-900 Precision Massage Gun"
