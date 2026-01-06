@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Grp19OnlineBookStorePE03.Config.Entities;
+using Grp19OnlineBookStorePE03.Data;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Grp19OnlineBookStorePE03.Classes;
-using Grp19OnlineBookStorePE03.Config.Entities;
 
 namespace Grp19OnlineBookStorePE03.Data
 {
-    public class Grp19OnlineBookStorePE03Context : DbContext
+    public class Grp19OnlineBookStorePE03Context(DbContextOptions<Grp19OnlineBookStorePE03Context> options) : IdentityDbContext<OnlineBookStoreUser>(options)
     {
-        public Grp19OnlineBookStorePE03Context(DbContextOptions<Grp19OnlineBookStorePE03Context> options)
-            : base(options)
-        {
-        }
         public DbSet<Grp19OnlineBookStorePE03.Classes.Staff> Staff { get; set; } = default!;
         public DbSet<Grp19OnlineBookStorePE03.Classes.Customer> Customer { get; set; } = default!;
         public DbSet<Grp19OnlineBookStorePE03.Classes.Book> Book { get; set; } = default!;
@@ -21,9 +14,9 @@ namespace Grp19OnlineBookStorePE03.Data
         public DbSet<Grp19OnlineBookStorePE03.Classes.Order> Order { get; set; } = default!;
         public DbSet<Grp19OnlineBookStorePE03.Classes.OrderItem> OrderItem { get; set; } = default!;
         public DbSet<Grp19OnlineBookStorePE03.Classes.Payment> Payment { get; set; } = default!;
-        
 
-    protected override void OnModelCreating(ModelBuilder builder)
+
+        protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
@@ -32,6 +25,5 @@ namespace Grp19OnlineBookStorePE03.Data
             builder.ApplyConfiguration(new CustomerSeed());
             builder.ApplyConfiguration(new MiscSeed());
         }
-
     }
 }
