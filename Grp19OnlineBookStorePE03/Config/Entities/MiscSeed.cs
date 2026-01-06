@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Grp19OnlineBookStorePE03.Config.Entities
 {
-        public class MiscSamples : IEntityTypeConfiguration<Misc>
+        public class MiscSeed : IEntityTypeConfiguration<Misc>
         {
             public void Configure(EntityTypeBuilder<Misc> builder)
             {
@@ -13,15 +13,17 @@ namespace Grp19OnlineBookStorePE03.Config.Entities
                     {
                         Id = 1,
                         Category = "Stationary",
-                        Price = 450,
-                        MiscName = " PIX Black Ballpoint Pen"
+                        Price = 450.0M,
+                        MiscName = " PIX Black Ballpoint Pen",
+                        StaffId = 2
                     },
                     new Misc
                     {
                         Id = 2,
                         Category = "Office Supplies",
                         Price = 33.00M,
-                        MiscName = "Canon Original Black Cartridge"
+                        MiscName = "Canon Original Black Cartridge",
+                        StaffId = 2
 
                     },
                     new Misc
@@ -29,7 +31,8 @@ namespace Grp19OnlineBookStorePE03.Config.Entities
                         Id = 3,
                         Category = "Wellness",
                         Price = 67.50M,
-                        MiscName = "Hitachi HMG-900 Precision Massage Gun"
+                        MiscName = "Hitachi HMG-900 Precision Massage Gun",
+                        StaffId = 2
 
                     }
 

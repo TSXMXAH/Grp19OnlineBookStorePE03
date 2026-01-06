@@ -12,26 +12,26 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Grp19OnlineBookStorePE03.Migrations
 {
     [DbContext(typeof(Grp19OnlineBookStorePE03Context))]
-    [Migration("20251207063421_SeedInitialData")]
-    partial class SeedInitialData
+    [Migration("20260106023331_SeedCustomerLogin")]
+    partial class SeedCustomerLogin
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("ProductVersion", "8.0.22")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.Book", b =>
                 {
-                    b.Property<int>("BookId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Author")
                         .HasColumnType("nvarchar(max)");
@@ -48,20 +48,49 @@ namespace Grp19OnlineBookStorePE03.Migrations
                     b.Property<int>("StaffId")
                         .HasColumnType("int");
 
-                    b.HasKey("BookId");
+                    b.HasKey("Id");
 
                     b.HasIndex("StaffId");
 
                     b.ToTable("Book");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Author = "Holly Black",
+                            BookName = "The Cruel Prince",
+                            Category = "Romance",
+                            Price = 17.20m,
+                            StaffId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Author = "Vince Elson",
+                            BookName = "The Laughing King",
+                            Category = "Comedy",
+                            Price = 18.50m,
+                            StaffId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Author = "Holly Black",
+                            BookName = "The Queen Of Nothing",
+                            Category = "Romance",
+                            Price = 16.50m,
+                            StaffId = 1
+                        });
                 });
 
             modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.Customer", b =>
                 {
-                    b.Property<int>("CustomerId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
@@ -78,18 +107,29 @@ namespace Grp19OnlineBookStorePE03.Migrations
                     b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("CustomerId");
+                    b.HasKey("Id");
 
                     b.ToTable("Customer");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Address = "676 Tampines Drive, Stree 41",
+                            ContactNum = "86605947",
+                            Login = "sarah123",
+                            Name = "Sarah",
+                            Password = "password123"
+                        });
                 });
 
             modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.Misc", b =>
                 {
-                    b.Property<int>("MiscId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MiscId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");
@@ -103,28 +143,58 @@ namespace Grp19OnlineBookStorePE03.Migrations
                     b.Property<int>("StaffId")
                         .HasColumnType("int");
 
-                    b.HasKey("MiscId");
+                    b.HasKey("Id");
 
                     b.HasIndex("StaffId");
 
                     b.ToTable("Misc");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Category = "Stationary",
+                            MiscName = " PIX Black Ballpoint Pen",
+                            Price = 450.0m,
+                            StaffId = 2
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Category = "Office Supplies",
+                            MiscName = "Canon Original Black Cartridge",
+                            Price = 33.00m,
+                            StaffId = 2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Category = "Wellness",
+                            MiscName = "Hitachi HMG-900 Precision Massage Gun",
+                            Price = 67.50m,
+                            StaffId = 2
+                        });
                 });
 
             modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.Order", b =>
                 {
-                    b.Property<int>("OrderId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("OrderStatus")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("OrderId");
+                    b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
 
@@ -133,25 +203,28 @@ namespace Grp19OnlineBookStorePE03.Migrations
 
             modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.OrderItem", b =>
                 {
-                    b.Property<int>("OrderItemId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderItemId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<int>("MiscId")
+                    b.Property<int?>("MiscId")
                         .HasColumnType("int");
 
                     b.Property<int?>("OrderId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Subtotal")
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("OrderItemId");
+                    b.HasKey("Id");
 
                     b.HasIndex("BookId");
 
@@ -164,11 +237,11 @@ namespace Grp19OnlineBookStorePE03.Migrations
 
             modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.Payment", b =>
                 {
-                    b.Property<int>("PaymentId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("AmountPaid")
                         .HasColumnType("decimal(18,2)");
@@ -176,7 +249,10 @@ namespace Grp19OnlineBookStorePE03.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
-                    b.HasKey("PaymentId");
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("OrderId")
                         .IsUnique();
@@ -186,11 +262,11 @@ namespace Grp19OnlineBookStorePE03.Migrations
 
             modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.Staff", b =>
                 {
-                    b.Property<int>("StaffId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StaffId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -198,9 +274,23 @@ namespace Grp19OnlineBookStorePE03.Migrations
                     b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("StaffId");
+                    b.HasKey("Id");
 
                     b.ToTable("Staff");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "BookStaff",
+                            Password = "123"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "MiscStaff",
+                            Password = "321"
+                        });
                 });
 
             modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.Book", b =>
@@ -240,14 +330,11 @@ namespace Grp19OnlineBookStorePE03.Migrations
                 {
                     b.HasOne("Grp19OnlineBookStorePE03.Classes.Book", "Book")
                         .WithMany()
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("BookId");
 
                     b.HasOne("Grp19OnlineBookStorePE03.Classes.Misc", "Misc")
                         .WithMany()
-                        .HasForeignKey("MiscId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("MiscId");
 
                     b.HasOne("Grp19OnlineBookStorePE03.Classes.Order", "Order")
                         .WithMany("OrderItems")

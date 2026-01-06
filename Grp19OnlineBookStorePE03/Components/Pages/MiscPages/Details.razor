@@ -1,0 +1,52 @@
+﻿@page "/miscs/details"
+@using Microsoft.EntityFrameworkCore
+@using Grp19OnlineBookStorePE03.Classes
+@inject IDbContextFactory<Grp19OnlineBookStorePE03.Data.Grp19OnlineBookStorePE03Context> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Misc</h2>
+    <hr />
+    @if (misc is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">MiscName</dt>
+            <dd class="col-sm-10">@misc.MiscName</dd>
+            <dt class="col-sm-2">Category</dt>
+            <dd class="col-sm-10">@misc.Category</dd>
+            <dt class="col-sm-2">Price</dt>
+            <dd class="col-sm-10">@misc.Price</dd>
+            <dt class="col-sm-2">StaffId</dt>
+            <dd class="col-sm-10">@misc.StaffId</dd>
+        </dl>
+        <div>
+            <a href="@($"/miscs/edit?id={misc.Id}")">Edit</a> |
+            <a href="@($"/miscs")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Misc? misc;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        misc = await context.Misc.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (misc is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

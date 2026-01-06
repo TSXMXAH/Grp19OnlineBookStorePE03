@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Grp19OnlineBookStorePE03.Config.Entities
 {
-    public class IndebtedStaff: IEntityTypeConfiguration<Staff>
+    public class StaffSeed: IEntityTypeConfiguration<Staff>
         {
             public void Configure(EntityTypeBuilder<Staff> builder)
             {

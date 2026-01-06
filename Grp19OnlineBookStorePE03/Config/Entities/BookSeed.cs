@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Grp19OnlineBookStorePE03.Config.Entities
 {
-    public class BookSamples : IEntityTypeConfiguration<Book>
+    public class BookSeed : IEntityTypeConfiguration<Book>
     {
         public void Configure(EntityTypeBuilder<Book> builder)
         {
@@ -15,15 +15,17 @@ namespace Grp19OnlineBookStorePE03.Config.Entities
                     Category = "Romance",
                     Price = 17.20M,
                     Author = "Holly Black",
-                    BookName = "The Cruel Prince"
+                    BookName = "The Cruel Prince",
+                    StaffId = 1
                 },
                 new Book
                 {
                     Id = 2,
-                    Category = "Romance",
+                    Category = "Comedy",
                     Price = 18.50M,
-                    Author = "Holly Black",
-                    BookName = "The Wicked King"
+                    Author = "Vince Elson",
+                    BookName = "The Laughing King",
+                    StaffId = 1
                 },
                 new Book
                 {
@@ -31,7 +33,8 @@ namespace Grp19OnlineBookStorePE03.Config.Entities
                     Category = "Romance",
                     Price = 16.50M,
                     Author = "Holly Black",
-                    BookName = "The Queen Of Nothing"
+                    BookName = "The Queen Of Nothing",
+                    StaffId = 1
                 }
                 );
         }

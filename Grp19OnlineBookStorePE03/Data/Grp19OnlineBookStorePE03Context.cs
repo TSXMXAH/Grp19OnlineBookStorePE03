@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Grp19OnlineBookStorePE03.Classes;
+using Grp19OnlineBookStorePE03.Config.Entities;
 
 namespace Grp19OnlineBookStorePE03.Data
 {
@@ -22,23 +23,14 @@ namespace Grp19OnlineBookStorePE03.Data
         public DbSet<Grp19OnlineBookStorePE03.Classes.Payment> Payment { get; set; } = default!;
         
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(builder);
 
-            // OrderItem → Book
-            modelBuilder.Entity<OrderItem>()
-                .HasOne(oi => oi.Book)
-                .WithMany()
-                .HasForeignKey(oi => oi.BookId)
-                .OnDelete(DeleteBehavior.Restrict);   // Prevent cascade delete
-
-            // OrderItem → Misc
-            modelBuilder.Entity<OrderItem>()
-                .HasOne(oi => oi.Misc)
-                .WithMany()
-                .HasForeignKey(oi => oi.MiscId)
-                .OnDelete(DeleteBehavior.Restrict);   // Prevent cascade delete
+            builder.ApplyConfiguration(new StaffSeed());
+            builder.ApplyConfiguration(new BookSeed());
+            builder.ApplyConfiguration(new CustomerSeed());
+            builder.ApplyConfiguration(new MiscSeed());
         }
 
     }

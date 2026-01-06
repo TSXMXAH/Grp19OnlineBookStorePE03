@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Grp19OnlineBookStorePE03.Config.Entities
 {
-    public class CustomerSample : IEntityTypeConfiguration<Customer>
+    public class CustomerSeed : IEntityTypeConfiguration<Customer>
     {
         public void Configure(EntityTypeBuilder<Customer> builder)
         {
@@ -14,7 +14,9 @@ namespace Grp19OnlineBookStorePE03.Config.Entities
                     Id = 1,
                     Name = "Sarah",
                     Address = "676 Tampines Drive, Stree 41",
-                    ContactNum = "86605947"
+                    ContactNum = "86605947",
+                    Login = "sarah123",
+                    Password = "password123"
                 }
                 );
         }

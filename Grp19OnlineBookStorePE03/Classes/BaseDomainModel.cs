@@ -1,6 +1,6 @@
 ﻿namespace Grp19OnlineBookStorePE03.Classes
 {
-    public class Inheritance
+    public class BaseDomainModel
     {
             public int Id { get; set; }
  

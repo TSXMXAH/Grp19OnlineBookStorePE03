@@ -1,11 +1,12 @@
 ﻿namespace Grp19OnlineBookStorePE03.Classes
 {
-    public class Misc : Inheritance
+    public class Misc : BaseDomainModel
     {
-        public int StaffId { get; set; } //FK
-        public Staff? Staff { get; set; } //Nav_Link_in ( handles > Misc ) 
+        public string? MiscName { get; set; }
         public string? Category { get; set; }
         public decimal Price { get; set; }
-        public string? MiscName { get; set; }
+
+        public int StaffId { get; set; }
+        public Staff? Staff { get; set; }
     }
 }

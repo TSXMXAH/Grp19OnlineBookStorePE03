@@ -1,13 +1,18 @@
 ﻿namespace Grp19OnlineBookStorePE03.Classes
 {
-    public class OrderItem : Inheritance
+    public class OrderItem : BaseDomainModel
     {
-        public int? OrderId { get; set; } //FK
-        public Order? Order { get; set; } //Nav_Link_In (Order has>)
-        public int? BookId { get; set; } //FK
-        public Book? Book { get; set; } //Nav_Link_In (has> Book) 
-        public int MiscId { get; set; } //FK
-        public Misc? Misc { get; set; } //Nav_Link_In (has> Misc)
-        public decimal Subtotal { get; set; }
+        public int? OrderId { get; set; } 
+        public Order? Order { get; set; } 
+        public int? BookId { get; set; } 
+        public Book? Book { get; set; } 
+        public int? MiscId { get; set; } 
+        public Misc? Misc { get; set; } 
+        public int Quantity {  get; set; }
+        public decimal UnitPrice { get; set; }
+        public decimal Subtotal 
+        {
+            get { return Quantity *  UnitPrice; }
+        }
     }
 }

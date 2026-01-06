@@ -1,11 +1,14 @@
 ﻿namespace Grp19OnlineBookStorePE03.Classes
 {
-    public class Order : Inheritance
+    public class Order : BaseDomainModel
     {
-        public List<OrderItem> OrderItems { get; set; } = new(); //Nav_Link_Out ( Order has > )
-        public Payment? Payment { get; set; } //Nav_Link_Out ( Order has > )
-        public int CustomerId { get; set; } //FK
-        public Customer? Customer { get; set; } //Nav_Link_In ( has > Order )
-        public string? OrderStatus { get; set; }
+        public DateTime OrderDate { get; set; } = DateTime.Now;
+        public string OrderStatus { get; set; } = "Pending";
+
+        public int CustomerId { get; set; }
+        public Customer? Customer { get; set; }
+
+        public List<OrderItem> OrderItems { get; set; } = new();
+        public Payment? Payment { get; set; }
     }
 }
