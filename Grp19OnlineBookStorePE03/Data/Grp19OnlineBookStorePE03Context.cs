@@ -24,6 +24,9 @@ namespace Grp19OnlineBookStorePE03.Data
             builder.ApplyConfiguration(new BookSeed());
             builder.ApplyConfiguration(new CustomerSeed());
             builder.ApplyConfiguration(new MiscSeed());
+            builder.ApplyConfiguration(new RoleSeed());
+            builder.ApplyConfiguration(new UserRoleSeed());
+            builder.ApplyConfiguration(new UserSeed());
         }
     }
 }
