@@ -4,6 +4,8 @@
 @inject IDbContextFactory<Grp19OnlineBookStorePE03.Data.Grp19OnlineBookStorePE03Context> DbFactory
 @inject NavigationManager NavigationManager
 
+@attribute [Authorize(Roles = "Admin")]
+
 <PageTitle>Create</PageTitle>
 
 <h1>Create</h1>

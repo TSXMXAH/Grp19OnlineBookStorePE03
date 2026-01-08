@@ -1,4 +1,5 @@
 ﻿@page "/books"
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using Grp19OnlineBookStorePE03.Classes
@@ -6,13 +7,16 @@
 @implements IAsyncDisposable
 @inject IDbContextFactory<Grp19OnlineBookStorePE03.Data.Grp19OnlineBookStorePE03Context> DbFactory
 
+@attribute [Authorize(Roles = "Admin, User")]
+
 <PageTitle>Index</PageTitle>
 
 <h1>Index</h1>
-
+<AuthorizeView Roles="Admin">
 <p>
     <a href="books/create">Create New</a>
 </p>
+</AuthorizeView>
 
 <QuickGrid Class="table" Items="context.Book">
     <PropertyColumn Property="book => book.BookName" />
@@ -22,9 +26,11 @@
     <PropertyColumn Property="book => book.StaffId" />
 
     <TemplateColumn Context="book">
-        <a href="@($"books/edit?id={book.Id}")">Edit</a> |
-        <a href="@($"books/details?id={book.Id}")">Details</a> |
+        <a href="@($"books/details?id={book.Id}")">Details</a> 
+        <AuthorizeView Roles="Admin">
+        | <a href="@($"books/edit?id={book.Id}")">Edit</a> |
         <a href="@($"books/delete?id={book.Id}")">Delete</a>
+        </AuthorizeView>
     </TemplateColumn>
 </QuickGrid>
 
