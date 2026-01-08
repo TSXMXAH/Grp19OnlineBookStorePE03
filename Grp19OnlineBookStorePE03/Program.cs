@@ -34,6 +34,7 @@ builder.Services.AddAuthentication(options =>
     .AddIdentityCookies();
 
 builder.Services.AddIdentityCore<OnlineBookStoreUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<Grp19OnlineBookStorePE03Context>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
