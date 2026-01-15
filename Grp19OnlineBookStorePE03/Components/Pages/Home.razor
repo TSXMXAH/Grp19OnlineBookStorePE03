@@ -1,158 +1,141 @@
 ﻿@page "/"
+@using Grp19OnlineBookStorePE03.Classes
+@using Grp19OnlineBookStorePE03.Data
+@using Microsoft.EntityFrameworkCore
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Store</title>
+@inject Grp19OnlineBookStorePE03Context DbContext
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f2f2f2;
-        }
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+    }
 
-        /* NAVBAR */
-        .navbar {
-            background: red;
-            display: flex;
-            justify-content: space-between;
-            padding: 15px;
-            color: white;
-            font-weight: bold;
-        }
+    /* NAVBAR */
+    .navbar {
+        background: red;
+        display: flex;
+        justify-content: space-between;
+        padding: 15px;
+        color: white;
+        font-weight: bold;
+    }
 
-       .nav-left, .nav-right {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-        }
+    .nav-left, .nav-right {
+        display: flex;
+        gap: 30px;
+        align-items: center;
+    }
 
-        .nav-item {
-            cursor: pointer;
-        }
+    .nav-item {
+        cursor: pointer;
+    }
 
-        /* BOOK LIST */
-        .book-list {
-            width: 90%;
-            margin: 40px auto;
-        }
+    /* BOOK LIST */
+    .book-list {
+        width: 90%;
+        margin: 40px auto;
+    }
 
-        .book-item {
-            display: flex;
-            justify-content: space-between;
-            background: white;
-            padding: 20px;
-            margin-bottom: 30px;
-            border-radius: 8px;
-        }
+    .book-item {
+        display: flex;
+        justify-content: space-between;
+        background: white;
+        padding: 20px;
+        margin-bottom: 30px;
+        border-radius: 8px;
+    }
 
-        .book-cover {
-            width: 150px;
-            height: 200px;
-            background: #ccc;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 14px;
-            text-align: center;
-        }
+    .book-cover {
+        width: 150px;
+        height: 200px;
+        background: #ccc;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px;
+        text-align: center;
+    }
 
-        .book-info {
-            width: 60%;
-            line-height: 1.6;
-        }
+    .book-info {
+        width: 60%;
+        line-height: 1.6;
+    }
 
-        .book-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            justify-content: center;
-        }
+    .book-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        justify-content: center;
+    }
 
-        .btn {
-            background: red;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            cursor: pointer;
-            text-align: center;
-            font-weight: bold;
-            width: 150px;
-            border-radius: 5px;
-        }
+    .btn {
+        background: red;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        cursor: pointer;
+        text-align: center;
+        font-weight: bold;
+        width: 150px;
+        border-radius: 5px;
+    }
 
-    </style>
-</head>
+</style>
+<br /><br />
 
-<body>
+<h1>Trending Books!</h1>
 
-    @*Book List*@
-    <div class="book-list">
+<div class="book-list">
+    @if (trendingBooks == null)
+    {
+        <p>Loading books...</p>
+    }
+    else if (!trendingBooks.Any())
+    {
+        <p>No books available.</p>
+    }
+    else
+    {
+        @foreach (var book in trendingBooks)
+        {
+            <div class="book-item">
+                <div class="book-cover">
+                    @if (!string.IsNullOrEmpty(""))
+                    {
+                        <img src="" alt="@book.BookName" style="width:100%; height:100%; object-fit:cover;" />
+                    }
+                    else
+                    {
+                        <span>Book Cover<br>here</span>
+                    }
+                </div>
 
-        @*Book 1*@
-        <div class="book-item">
-            <div class="book-cover">Book Cover<br>here</div>
+                <div class="book-info">
+                    <strong>Book Title: @book.BookName</strong><br>
+                    Author: @book.Author<br><br>
+                    Catergory: @book.Category<br><br>
+                    Synopsis: WIP<br><br>
+                    <strong>Price: $@book.Price</strong>
+                </div>
 
-            <div class="book-info">
-                <strong>Book Title: How To Dig a Hole</strong><br>
-                Author: Dwarf A<br><br>
-
-                Synopsis: This book explores Dwarf A's methods on digging holes.<br><br>
-
-                <strong>Price: $20</strong>
+                <div class="book-buttons">
+                    <button class="btn">ADD TO CART</button>
+                    <button class="btn">WISHLIST</button>
+                    <button class="btn">REVIEW</button>
+                </div>
             </div>
+        }
+    }
+</div>
 
-            <div class="book-buttons">
-                <button class="btn">ADD TO CART</button>
-                <button class="btn">WISHLIST</button>
-                <button class="btn">REVIEW</button>
-            </div>
-        </div>
+@code {
+    private List<Book>? trendingBooks;
 
-        @*Book 2*@
-        <div class="book-item">
-            <div class="book-cover">Book Cover<br>here</div>
-
-            <div class="book-info">
-                <strong>Book Title: How NOT To Dig a Hole</strong><br>
-                Author: Dwarf A<br><br>
-
-                Synopsis: This book explores Dwarf A's methods on how NOT to dig a hole.<br><br>
-
-                <strong>Price: $20</strong>
-            </div>
-
-            <div class="book-buttons">
-                <button class="btn">ADD TO CART</button>
-                <button class="btn">WISHLIST</button>
-                <button class="btn">REVIEW</button>
-            </div>
-        </div>
-
-        @*Book 3*@
-        <div class="book-item">
-            <div class="book-cover">Book Cover<br>here</div>
-
-            <div class="book-info">
-                <strong>Book Title: How To Build a Particle Accelerator</strong><br>
-                Author: Dwarf A<br><br>
-
-                Synopsis: This book explores how Dwarf A builds his particle accelerators in the hole he dug.<br><br>
-
-                <strong>Price: $3</strong>
-            </div>
-
-            <div class="book-buttons">
-                <button class="btn">ADD TO CART</button>
-                <button class="btn">WISHLIST</button>
-                <button class="btn">REVIEW</button>
-            </div>
-        </div>
-
-    </div>
-
-</body>
-</html>
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch all books from the database
+        trendingBooks = await DbContext.Book.ToListAsync();
+    }
+}

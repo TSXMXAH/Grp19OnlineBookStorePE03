@@ -3,7 +3,7 @@
 @using Grp19OnlineBookStorePE03.Classes
 @inject IDbContextFactory<Grp19OnlineBookStorePE03.Data.Grp19OnlineBookStorePE03Context> DbFactory
 @inject NavigationManager NavigationManager
-
+@attribute [Authorize(Roles = "Admin,User")]
 <PageTitle>Details</PageTitle>
 
 <h1>Details</h1>
@@ -29,7 +29,9 @@
             <dd class="col-sm-10">@book.StaffId</dd>
         </dl>
         <div>
-            <a href="@($"/books/edit?id={book.Id}")">Edit</a> |
+        <AuthorizeView Roles="Admin"> 
+            <a href="@($"/books/edit?id={book.Id}")">Edit</a> | 
+            </AuthorizeView>
             <a href="@($"/books")">Back to List</a>
         </div>
     }
