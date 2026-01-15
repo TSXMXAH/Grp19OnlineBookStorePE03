@@ -1,4 +1,5 @@
 ﻿@page "/"
+
 @using Grp19OnlineBookStorePE03.Classes
 @using Grp19OnlineBookStorePE03.Data
 @using Microsoft.EntityFrameworkCore
@@ -6,136 +7,142 @@
 @inject Grp19OnlineBookStorePE03Context DbContext
 
 <style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f2f2f2;
-    }
-
-    /* NAVBAR */
-    .navbar {
-        background: red;
-        display: flex;
-        justify-content: space-between;
-        padding: 15px;
-        color: white;
-        font-weight: bold;
-    }
-
-    .nav-left, .nav-right {
-        display: flex;
-        gap: 30px;
-        align-items: center;
-    }
-
-    .nav-item {
-        cursor: pointer;
-    }
-
-    /* BOOK LIST */
-    .book-list {
+    .section {
         width: 90%;
         margin: 40px auto;
     }
 
-    .book-item {
-        display: flex;
-        justify-content: space-between;
-        background: white;
-        padding: 20px;
-        margin-bottom: 30px;
-        border-radius: 8px;
+        .section h1 {
+            margin-bottom: 25px;
+        }
+
+    /* GRID LAYOUT */
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
     }
 
-    .book-cover {
-        width: 150px;
+    .card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .card-cover {
         height: 200px;
         background: #ccc;
         display: flex;
-        justify-content: center;
         align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
         font-size: 14px;
-        text-align: center;
     }
 
-    .book-info {
-        width: 60%;
+    .card-info {
         line-height: 1.6;
+        margin-bottom: 20px;
     }
 
-    .book-buttons {
+    .card-buttons {
         display: flex;
         flex-direction: column;
-        gap: 15px;
-        justify-content: center;
+        gap: 10px;
     }
 
     .btn {
         background: red;
         color: white;
         border: none;
-        padding: 12px 20px;
-        cursor: pointer;
-        text-align: center;
+        padding: 10px;
         font-weight: bold;
-        width: 150px;
+        cursor: pointer;
         border-radius: 5px;
     }
-
 </style>
-<br /><br />
 
-<h1>Trending Books!</h1>
+<!-- ================= BOOK SECTION ================= -->
+<div class="section">
+    <h1>Top three picks for you!</h1>
 
-<div class="book-list">
-    @if (trendingBooks == null)
+    @if (topBooks == null)
     {
         <p>Loading books...</p>
     }
-    else if (!trendingBooks.Any())
-    {
-        <p>No books available.</p>
-    }
     else
     {
-        @foreach (var book in trendingBooks)
-        {
-            <div class="book-item">
-                <div class="book-cover">
-                    @if (!string.IsNullOrEmpty(""))
-                    {
-                        <img src="" alt="@book.BookName" style="width:100%; height:100%; object-fit:cover;" />
-                    }
-                    else
-                    {
-                        <span>Book Cover<br>here</span>
-                    }
-                </div>
+        <div class="card-grid">
+            @foreach (var book in topBooks)
+            {
+                <div class="card">
+                    <div class="card-cover">Book Cover</div>
 
-                <div class="book-info">
-                    <strong>Book Title: @book.BookName</strong><br>
-                    Author: @book.Author<br><br>
-                    Catergory: @book.Category<br><br>
-                    Synopsis: WIP<br><br>
-                    <strong>Price: $@book.Price</strong>
-                </div>
+                    <div class="card-info">
+                        <strong>@book.BookName</strong><br />
+                        Author: @book.Author<br />
+                        Category: @book.Category<br /><br />
+                        <strong>$@book.Price</strong>
+                    </div>
 
-                <div class="book-buttons">
-                    <button class="btn">ADD TO CART</button>
-                    <button class="btn">WISHLIST</button>
-                    <button class="btn">REVIEW</button>
+                    <div class="card-buttons">
+                        <button class="btn">ADD TO CART</button>
+                        <button class="btn">WISHLIST</button>
+                    </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
     }
 </div>
 
+<!-- ================= MISC SECTION ================= -->
+<div class="section">
+    <h1>Other cool stuff you might like</h1>
+
+    @if (topMisc == null)
+    {
+        <p>Loading items...</p>
+    }
+    else
+    {
+        <div class="card-grid">
+            @foreach (var item in topMisc)
+            {
+                <div class="card">
+                    <div class="card-cover">Item Image</div>
+
+                    <div class="card-info">
+                        <strong>@item.MiscName</strong><br />
+                        Category: @item.Category<br /><br />
+                        <strong>$@item.Price</strong>
+                    </div>
+
+                    <div class="card-buttons">
+                        <button class="btn">ADD TO CART</button>
+                        <button class="btn">WISHLIST</button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+</div>
 @code {
-    private List<Book>? trendingBooks;
+    private List<Book>? topBooks;
+    private List<Misc>? topMisc;
 
     protected override async Task OnInitializedAsync()
     {
-        // Fetch all books from the database
-        trendingBooks = await DbContext.Book.ToListAsync();
+        topBooks = await DbContext.Book
+            .OrderBy(b => Guid.NewGuid())
+            .Take(3)
+            .ToListAsync();
+
+        topMisc = await DbContext.Misc
+            .OrderBy(m => Guid.NewGuid())
+            .Take(3)
+            .ToListAsync();
     }
 }

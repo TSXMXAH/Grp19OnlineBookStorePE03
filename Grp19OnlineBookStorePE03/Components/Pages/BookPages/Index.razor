@@ -1,46 +1,162 @@
 ﻿@page "/books"
+
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
-@using Microsoft.AspNetCore.Components.QuickGrid
 @using Grp19OnlineBookStorePE03.Classes
 @using Grp19OnlineBookStorePE03.Data
+
 @implements IAsyncDisposable
-@inject IDbContextFactory<Grp19OnlineBookStorePE03.Data.Grp19OnlineBookStorePE03Context> DbFactory
+@inject IDbContextFactory<Grp19OnlineBookStorePE03Context> DbFactory
 
 @attribute [Authorize(Roles = "Admin, User")]
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Books</PageTitle>
 
-<h1>Index</h1>
+<style>
+    .book-list {
+        width: 90%;
+        margin: 40px auto;
+    }
+
+    .book-item {
+        display: flex;
+        justify-content: space-between;
+        background: white;
+        padding: 20px;
+        margin-bottom: 30px;
+        border-radius: 8px;
+    }
+
+    .book-cover {
+        width: 150px;
+        height: 200px;
+        background: #ccc;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px;
+    }
+
+    .book-info {
+        width: 55%;
+        line-height: 1.6;
+    }
+
+    .book-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        justify-content: center;
+        min-width: 160px;
+    }
+
+    .btn {
+        background: red;
+        color: white;
+        border: none;
+        padding: 10px;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+        .btn.secondary {
+            background: #555;
+        }
+
+        .btn.outline {
+            background: white;
+            color: red;
+            border: 2px solid red;
+        }
+
+    .admin-links a {
+        font-size: 13px;
+        margin-right: 10px;
+    }
+</style>
+
+<h1>All Books</h1>
+
 <AuthorizeView Roles="Admin">
-<p>
-    <a href="books/create">Create New</a>
-</p>
+    <p>
+        <a class="btn" href="books/create">Create New Book</a>
+    </p>
 </AuthorizeView>
 
-<QuickGrid Class="table" Items="context.Book">
-    <PropertyColumn Property="book => book.BookName" />
-    <PropertyColumn Property="book => book.Author" />
-    <PropertyColumn Property="book => book.Category" />
-    <PropertyColumn Property="book => book.Price" />
-    <PropertyColumn Property="book => book.StaffId" />
+<div class="book-list">
+    @if (books == null)
+    {
+        <p>Loading books...</p>
+    }
+    else if (!books.Any())
+    {
+        <p>No books available.</p>
+    }
+    else
+    {
+        @foreach (var book in books)
+        {
+            <div class="book-item">
 
-    <TemplateColumn Context="book">
-        <a href="@($"books/details?id={book.Id}")">Details</a> 
-        <AuthorizeView Roles="Admin">
-        | <a href="@($"books/edit?id={book.Id}")">Edit</a> |
-        <a href="@($"books/delete?id={book.Id}")">Delete</a>
-        </AuthorizeView>
-    </TemplateColumn>
-</QuickGrid>
+                <div class="book-cover">
+                    Book Cover
+                </div>
+
+                <div class="book-info">
+                    <strong>@book.BookName</strong><br />
+                    Author: @book.Author<br />
+                    Category: @book.Category<br /><br />
+                    <strong>Price:</strong> $@book.Price
+                </div>
+
+                <div class="book-buttons">
+
+                    <!-- USER ACTIONS -->
+                    <button class="btn" @onclick="() => AddToCart(book.Id)">ADD TO CART</button>
+                    <button class="btn secondary" @onclick="() => AddToWishlist(book.Id)">WISHLIST</button>
+                    <a class="btn outline" href="@($"books/review?id={book.Id}")">REVIEW</a>
+
+                    <!-- ADMIN ACTIONS -->
+                    <AuthorizeView Roles="Admin">
+                        <div class="admin-links">
+                            <a href="@($"books/edit?id={book.Id}")">Edit</a>
+                            <a href="@($"books/delete?id={book.Id}")">Delete</a>
+                        </div>
+                    </AuthorizeView>
+
+                </div>
+
+            </div>
+        }
+    }
+</div>
 
 @code {
     private Grp19OnlineBookStorePE03Context context = default!;
+    private List<Book>? books;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         context = DbFactory.CreateDbContext();
+        books = await context.Book.ToListAsync();
     }
 
-    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+    // ---------------- USER ACTIONS (STUBS) ----------------
+
+    private void AddToCart(int bookId)
+    {
+        // TODO: Implement cart logic
+        Console.WriteLine($"Book {bookId} added to cart");
+    }
+
+    private void AddToWishlist(int bookId)
+    {
+        // TODO: Implement wishlist logic
+        Console.WriteLine($"Book {bookId} added to wishlist");
+    }
+
+    public async ValueTask DisposeAsync()
+        => await context.DisposeAsync();
 }
