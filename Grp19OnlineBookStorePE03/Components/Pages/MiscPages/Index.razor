@@ -5,15 +5,16 @@
 @using Grp19OnlineBookStorePE03.Data
 @implements IAsyncDisposable
 @inject IDbContextFactory<Grp19OnlineBookStorePE03.Data.Grp19OnlineBookStorePE03Context> DbFactory
+@attribute [Authorize(Roles = "Admin, User")]
 
 <PageTitle>Index</PageTitle>
 
 <h1>Index</h1>
-
+<AuthorizeView Roles="Admin">
 <p>
     <a href="miscs/create">Create New</a>
 </p>
-
+</AuthorizeView>
 <QuickGrid Class="table" Items="context.Misc">
     <PropertyColumn Property="misc => misc.MiscName" />
     <PropertyColumn Property="misc => misc.Category" />
@@ -21,9 +22,11 @@
     <PropertyColumn Property="misc => misc.StaffId" />
 
     <TemplateColumn Context="misc">
-        <a href="@($"miscs/edit?id={misc.Id}")">Edit</a> |
-        <a href="@($"miscs/details?id={misc.Id}")">Details</a> |
-        <a href="@($"miscs/delete?id={misc.Id}")">Delete</a>
+        <a href="@($"miscs/details?id={misc.Id}")">Details</a>
+        <AuthorizeView Roles="Admin">
+        | <a href="@($"miscs/edit?id={misc.Id}")">Edit</a> |
+          <a href="@($"miscs/delete?id={misc.Id}")">Delete</a>
+        </AuthorizeView>
     </TemplateColumn>
 </QuickGrid>
 
