@@ -1,4 +1,7 @@
-﻿@inject NavigationManager NavigationManager
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+
 <div class="custom-top-navbar">
 
     <div class="nav-left">
@@ -12,8 +15,15 @@
     </div>
 
     <div class="nav-right">
-        <NavLink class="nav-link" href="account/login">LOGIN</NavLink>
-    </div>  
+        <AuthorizeView>
+            <Authorized>
+                <NavLink class="nav-link" href="account/logout">LOGOUT</NavLink>
+            </Authorized>
+            <NotAuthorized>
+                <NavLink class="nav-link" href="account/login">LOGIN</NavLink>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
 </div>
 
 <style>
