@@ -1,0 +1,59 @@
+﻿@page "/bookstocks/delete"
+@using Microsoft.EntityFrameworkCore
+@using Grp19OnlineBookStorePE03.Classes
+@inject IDbContextFactory<Grp19OnlineBookStorePE03.Data.Grp19OnlineBookStorePE03Context> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>BookStock</h2>
+    <hr />
+    @if (bookstock is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">BookId</dt>
+            <dd class="col-sm-10">@bookstock.BookId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Quantity</dt>
+            <dd class="col-sm-10">@bookstock.Quantity</dd>
+        </dl>
+        <EditForm method="post" Model="bookstock" OnValidSubmit="DeleteBookStock" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(bookstock is null)">Delete</button> |
+            <a href="/bookstocks">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private BookStock? bookstock;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        bookstock = await context.BookStock.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (bookstock is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteBookStock()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.BookStock.Remove(bookstock!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/bookstocks");
+    }
+}

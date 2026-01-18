@@ -1,58 +1,23 @@
 ﻿@inject NavigationManager NavigationManager
 <div class="custom-top-navbar">
-
     <div class="nav-left">
-        <NavLink class="nav-link" href="/">HOME</NavLink>
+        <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">HOME</NavLink>
         <NavLink class="nav-link" href="books">BOOKS</NavLink>
         <NavLink class="nav-link" href="miscs">MISC</NavLink>
+        <AuthorizeView Roles="Admin">
+            <NavLink class="nav-link" href="/BackDoor/Import">IMPORT</NavLink>
+        </AuthorizeView>
     </div>
 
     <div class="nav-center">
-        <a class="brand-name">BookBuds</a>
+        <span class="brand-name">BookBuds</span>
     </div>
 
     <div class="nav-right">
         <NavLink class="nav-link" href="account/login">LOGIN</NavLink>
-    </div>  
+    </div>
 </div>
 
-<style>
-    .custom-top-navbar {
-        background: red;
-        color: white;
-        display: grid;
-        grid-template-columns: 1fr auto 1fr; 
-        align-items: center;
-        padding: 15px 30px;
-        width: 100%;
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 1000;
-    }
-
-    .nav-left {
-        display: flex;
-        justify-content: flex-start; 
-        gap: 30px;
-    }
-
-    .nav-center {
-        text-align: center; 
-    }
-
-    .nav-right {
-        display: flex;
-        justify-content: flex-end;
-        gap: 30px;
-    }
-
-    .brand-name {
-        color: white;
-        font-size: 20px;
-        font-weight: bold;
-    }
-</style>
 @code {
     private string? currentUrl;
     protected override void OnInitialized()

@@ -142,7 +142,7 @@
 @inject IdentityRedirectManager RedirectManager
 
 <PageTitle>Login</PageTitle>
-
+<div class="box-wrapper">
 <div class="box">
     <h2>LOGIN</h2>
 
@@ -178,24 +178,17 @@
         </div>
     </EditForm>
 </div>
+</div>
+
 
 <style>
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
-        background: #e5e5e5;
+    
+
+    .box-wrapper {
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
-    }
-
-    .box {
-        width: 350px;
-        background: #dcdcdc;
-        padding: 40px 30px;
-        text-align: center;
+        height: 100vh; /* full height viewport */
     }
 
     h2 {

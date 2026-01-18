@@ -1,7 +1,9 @@
-﻿using Grp19OnlineBookStorePE03.Config.Entities;
+﻿using Grp19OnlineBookStorePE03.Classes;
+using Grp19OnlineBookStorePE03.Config.Entities;
 using Grp19OnlineBookStorePE03.Data;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace Grp19OnlineBookStorePE03.Data
 {
@@ -14,7 +16,7 @@ namespace Grp19OnlineBookStorePE03.Data
         public DbSet<Grp19OnlineBookStorePE03.Classes.Order> Order { get; set; } = default!;
         public DbSet<Grp19OnlineBookStorePE03.Classes.OrderItem> OrderItem { get; set; } = default!;
         public DbSet<Grp19OnlineBookStorePE03.Classes.Payment> Payment { get; set; } = default!;
-
+        public DbSet<Grp19OnlineBookStorePE03.Classes.BookStock> BookStock { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -27,6 +29,8 @@ namespace Grp19OnlineBookStorePE03.Data
             builder.ApplyConfiguration(new RoleSeed());
             builder.ApplyConfiguration(new UserRoleSeed());
             builder.ApplyConfiguration(new UserSeed());
+            builder.ApplyConfiguration(new BookStockSeed());
         }
+        
     }
 }

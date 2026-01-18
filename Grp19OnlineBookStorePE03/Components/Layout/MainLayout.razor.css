@@ -95,3 +95,12 @@ main {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+@code {
+    [Parameter] public string BackgroundColor {
+        get;
+        set;
+    }
+
+    = "#34344A";
+}
