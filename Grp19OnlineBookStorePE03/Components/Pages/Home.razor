@@ -70,7 +70,7 @@
     }
 </style>
 
-<!-- ================= BOOK SECTION ================= -->
+<!-- Books -->
 <div class="section">
     <h1>Top three picks for you!</h1>
 
@@ -84,10 +84,14 @@
             @foreach (var book in topBooks)
             {
                 <div class="card">
-                    <div class="card-cover">Book Cover</div>
+                    <div class="card-cover">
+                        <a href="@book.CoverUrl" target="_blank">
+                            <img src="@book.CoverUrl" alt="Cover for @book.Title" />
+                        </a>
+                    </div>
 
                     <div class="card-info">
-                        <strong>@book.BookName</strong><br />
+                        <strong>@book.Title</strong><br />
                         Author: @book.Author<br />
                         Category: @book.Category<br /><br />
                         <strong>$@book.Price</strong>
@@ -104,12 +108,12 @@
                     </div>
 
                 </div>
-            }
+                 }
         </div>
     }
 </div>
 
-<!-- ================= MISC SECTION ================= -->
+<!-- Miscs-->
 <div class="section">
     <h1>Other cool stuff you might like</h1>
 

@@ -4,6 +4,7 @@ using Grp19OnlineBookStorePE03.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Grp19OnlineBookStorePE03.Migrations
 {
     [DbContext(typeof(Grp19OnlineBookStorePE03Context))]
-    partial class Grp19OnlineBookStorePE03ContextModelSnapshot : ModelSnapshot
+    [Migration("20260118060751_AddedBookStockSeed")]
+    partial class AddedBookStockSeed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,36 +139,6 @@ namespace Grp19OnlineBookStorePE03.Migrations
                             BookId = 3,
                             Quantity = 7
                         });
-                });
-
-            modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.CartItem", b =>
-                {
-                    b.Property<int>("CartItemId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CartItemId"));
-
-                    b.Property<int?>("BookId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("MiscId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("CartItemId");
-
-                    b.HasIndex("BookId");
-
-                    b.HasIndex("MiscId");
-
-                    b.ToTable("CartItem");
                 });
 
             modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.Customer", b =>
@@ -377,33 +350,6 @@ namespace Grp19OnlineBookStorePE03.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.WishlistItem", b =>
-                {
-                    b.Property<int>("WishlistItemId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WishlistItemId"));
-
-                    b.Property<int?>("BookId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("MiscId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("WishlistItemId");
-
-                    b.HasIndex("BookId");
-
-                    b.HasIndex("MiscId");
-
-                    b.ToTable("WishlistItem");
-                });
-
             modelBuilder.Entity("Grp19OnlineBookStorePE03.Data.OnlineBookStoreUser", b =>
                 {
                     b.Property<string>("Id")
@@ -480,7 +426,6 @@ namespace Grp19OnlineBookStorePE03.Migrations
                             Id = "c1a2b3c4-d5e6-4789-8901-234567890abc",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "f76215e9-81e0-4622-a34e-28d92aadb917",
-                            ConcurrencyStamp = "5a87ea7d-dca6-4d17-b7c7-f11d29b9ff70",
                             Email = "admin@localhost.com",
                             EmailConfirmed = true,
                             FirstName = "Admin",
@@ -491,9 +436,6 @@ namespace Grp19OnlineBookStorePE03.Migrations
                             PasswordHash = "AQAAAAIAAYagAAAAEO9yieCnEZDJJYQH3mZ4ZtrwQMUWA6dplJcYio8lisI5Ekb2t2BPwJebQQUzOyhYBQ==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "2a26b19f-8b63-43a3-92fa-a0e90be479fe",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHhvz6GvG3//DNekSw8Td7a/AayAhONpPNZUhyEpfEgFmMwwH1CLo/6I0g63SVrM3g==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "4c8efe82-594b-4d33-ba4e-33ba89c7a324",
                             TwoFactorEnabled = false,
                             UserName = "admin@localhost.com"
                         });
@@ -673,19 +615,6 @@ namespace Grp19OnlineBookStorePE03.Migrations
                         .IsRequired();
 
                     b.Navigation("Book");
-            modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.CartItem", b =>
-                {
-                    b.HasOne("Grp19OnlineBookStorePE03.Classes.Book", "Book")
-                        .WithMany()
-                        .HasForeignKey("BookId");
-
-                    b.HasOne("Grp19OnlineBookStorePE03.Classes.Misc", "Misc")
-                        .WithMany()
-                        .HasForeignKey("MiscId");
-
-                    b.Navigation("Book");
-
-                    b.Navigation("Misc");
                 });
 
             modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.Misc", b =>
@@ -740,23 +669,6 @@ namespace Grp19OnlineBookStorePE03.Migrations
                         .IsRequired();
 
                     b.Navigation("Order");
-                });
-
-            modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.WishlistItem", b =>
-                {
-                    b.HasOne("Grp19OnlineBookStorePE03.Classes.Book", "Book")
-                        .WithMany()
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Grp19OnlineBookStorePE03.Classes.Misc", "Misc")
-                        .WithMany()
-                        .HasForeignKey("MiscId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Book");
-
-                    b.Navigation("Misc");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

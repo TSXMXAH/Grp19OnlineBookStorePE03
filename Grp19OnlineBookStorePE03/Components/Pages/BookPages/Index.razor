@@ -1,4 +1,4 @@
-﻿@page "/books"
+@page "/books"
 @rendermode InteractiveServer
 
 @using Microsoft.AspNetCore.Authorization
@@ -17,140 +17,145 @@
 @inject ILogger<Book> Logger
 @attribute [Authorize(Roles = "Admin, User")]
 
-<PageTitle>Books</PageTitle>
+    <PageTitle>Books</PageTitle>
 
-<style>
-    .book-list {
-        width: 90%;
-        margin: 40px auto;
-    }
+    <style>
 
-    .book-item {
-        display: flex;
-        justify-content: space-between;
-        background: white;
-        padding: 20px;
-        margin-bottom: 30px;
-        border-radius: 8px;
-    }
-
-    .book-cover {
-        width: 150px;
-        height: 200px;
-        background: #ccc;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 14px;
-    }
-
-    .book-info {
-        width: 55%;
-        line-height: 1.6;
-    }
-
-    .book-buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        justify-content: center;
-        min-width: 160px;
-    }
-
-    .btn {
-        background: red;
-        color: white;
-        border: none;
-        padding: 10px;
-        font-weight: bold;
-        cursor: pointer;
-        border-radius: 5px;
-        text-align: center;
-    }
-
-        .btn.secondary {
-            background: #555;
+        .book-list {
+            width: 90%;
+            margin: 40px auto;
         }
 
-        .btn.outline {
+        .book-item {
+            display: flex;
+            justify-content: space-between;
             background: white;
-            color: red;
-            border: 2px solid red;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
         }
 
-    .admin-links a {
-        font-size: 13px;
-        margin-right: 10px;
-    }
-</style>
+        .book-cover {
+            width: 150px;
+            height: 250px;
+            background: #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+        }
 
-<h1>All Books</h1>
+        .book-info {
+            width: 55%;
+            line-height: 1.6;
+        }
 
-<AuthorizeView Roles="Admin">
-    <p>
-        <a class="btn" href="books/create">Create New Book</a>
-    </p>
-</AuthorizeView>
+        .book-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            justify-content: center;
+            min-width: 160px;
+        }
 
-<div class="book-list">
-    @if (books == null)
-    {
-        <p>Loading books...</p>
-    }
-    else if (!books.Any())
-    {
-        <p>No books available.</p>
-    }
-    else
-    {
-        @foreach (var book in books)
+        .btn {
+            background: red;
+            color: white;
+            border: none;
+            padding: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+            .btn.secondary {
+                background: #555;
+            }
+
+            .btn.outline {
+                background: white;
+                color: red;
+                border: 2px solid red;
+            }
+
+        .admin-links a {
+            font-size: 13px;
+            margin-right: 10px;
+        }
+    </style>
+    <div class="page-background books-bg">
+    <br /><br /><br />
+    <h1>The finest selection of literature</h1>
+
+    <AuthorizeView Roles="Admin">
+        <p>
+            <a class="btn" href="books/create">Create New Book</a>
+        </p>
+    </AuthorizeView>
+
+    <div class="book-list">
+        @if (books == null)
         {
-            <div class="book-item">
-
-                <div class="book-cover">
-                    Book Cover
-                </div>
-
-                <div class="book-info">
-                    <strong>@book.BookName</strong><br />
-                    Author: @book.Author<br />
-                    Category: @book.Category<br /><br />
-                    <strong>Price:</strong> $@book.Price
-                </div>
-
-                <div class="book-buttons">
-
-                    <!-- USER ACTIONS -->
-                    <button class="btn" @onclick="() => AddToCart(book.Id)">ADD TO CART</button>
-                    <button class="btn secondary" @onclick="() => AddToWishlist(book.Id)">WISHLIST</button>
-                    <a class="btn outline" href="@($"books/review?id={book.Id}")">REVIEW</a>
-
-                    <!-- ADMIN ACTIONS -->
-                    <AuthorizeView Roles="Admin">
-                        <div class="admin-links">
-                            <a href="@($"books/edit?id={book.Id}")">Edit</a>
-                            <a href="@($"books/delete?id={book.Id}")">Delete</a>
-                        </div>
-                    </AuthorizeView>
-
-                </div>
-
-            </div>
+            <p>Loading books...</p>
         }
-    }
+        else if (!books.Any())
+        {
+            <p>No books available.</p>
+        }
+        else
+        {
+            @foreach (var book in books)
+            {
+                <div class="book-item">
+
+                    <div class="book-cover">
+                        <a href="@book.CoverUrl" target="_blank">
+                            <img src="@book.CoverUrl" alt="Cover for @book.Title" style="width: 100%; height: 100%; object-fit: cover;" />
+                        </a>
+                    </div>
+
+                    <div class="book-info">
+                        <strong>@book.Title</strong><br />
+                        Author: @book.Author<br />
+                        Category: @book.Category<br /><br />
+                        <strong>Price:</strong> $@book.Price
+                    </div>
+
+                    <div class="book-buttons">
+
+                        <!-- User -->
+                        <button class="btn" @onclick="() => AddToCart(book.Id)">ADD TO CART</button>
+                        <button class="btn secondary" @onclick="() => AddToWishlist(book.Id)">WISHLIST</button>
+                        <a class="btn outline" href="@($"books/review?id={book.Id}")">REVIEW</a>
+
+                        <!-- Admin -->
+                        <AuthorizeView Roles="Admin">
+                            <div class="admin-links">
+                                <a href="@($"books/edit?id={book.Id}")">Edit</a>
+                                <a href="@($"books/delete?id={book.Id}")">Delete</a>
+                            </div>
+                        </AuthorizeView>
+
+                    </div>
+
+                </div>
+            }
+        }
+    </div>
 </div>
 
-@code {
-    private Grp19OnlineBookStorePE03Context context = default!;
-    private List<Book>? books;
+    @code {
+        private Grp19OnlineBookStorePE03Context context = default!;
+        private List<Book>? books;
 
-    protected override async Task OnInitializedAsync()
-    {
-        context = DbFactory.CreateDbContext();
-        books = await context.Book.ToListAsync();
-    }
+        protected override async Task OnInitializedAsync()
+        {
+            context = DbFactory.CreateDbContext();
+            books = await context.Book.ToListAsync();
+        }
 
-    // ---------------- USER ACTIONS (STUBS) ----------------
+        // ---------------- USER ACTIONS (STUBS) ----------------
 
     private async Task AddToCart(int bookId)
     {
@@ -223,6 +228,6 @@
         }
     }
 
-    public async ValueTask DisposeAsync()
-        => await context.DisposeAsync();
-}
+        public async ValueTask DisposeAsync()
+            => await context.DisposeAsync();
+    }

@@ -16,6 +16,7 @@ namespace Grp19OnlineBookStorePE03.Data
         public DbSet<Grp19OnlineBookStorePE03.Classes.Order> Order { get; set; } = default!;
         public DbSet<Grp19OnlineBookStorePE03.Classes.OrderItem> OrderItem { get; set; } = default!;
         public DbSet<Grp19OnlineBookStorePE03.Classes.Payment> Payment { get; set; } = default!;
+        public DbSet<Grp19OnlineBookStorePE03.Classes.BookStock> BookStock { get; set; } = default!;
         public DbSet<Grp19OnlineBookStorePE03.Classes.CartItem> CartItem{ get; set; } = default!;
         public DbSet<Grp19OnlineBookStorePE03.Classes.WishlistItem> WishlistItem { get; set; } = default!;
 
@@ -41,6 +42,8 @@ namespace Grp19OnlineBookStorePE03.Data
             builder.ApplyConfiguration(new RoleSeed());
             builder.ApplyConfiguration(new UserRoleSeed());
             builder.ApplyConfiguration(new UserSeed());
+            builder.ApplyConfiguration(new BookStockSeed());
         }
+        
     }
 }

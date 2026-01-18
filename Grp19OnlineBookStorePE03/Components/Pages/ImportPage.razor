@@ -1,0 +1,236 @@
+﻿@page "/BackDoor/Import"
+@inject OpenLibraryService OpenLibraryService
+@inject IServiceProvider ServiceProvider
+@using Grp19OnlineBookStorePE03.Data
+@using Grp19OnlineBookStorePE03.Services
+@using Grp19OnlineBookStorePE03.Dtos.OpenLibrary
+@using Microsoft.EntityFrameworkCore
+@rendermode InteractiveServer
+
+<br /><br /><br />
+<h3>Admin Book Import</h3>
+
+<div class="mb-3">
+   
+    <input type="text" @bind="searchQuery" @onkeypress="@(async e => { if (e.Key == "Enter") await SearchBooks(); })" placeholder="Search..." class="form-control w-50 d-inline" />
+
+    <select @bind="searchType" class="form-select w-auto d-inline ms-2">
+        <option value="title">Title</option>
+        <option value="author">Author</option>
+        <option value="isbn">ISBN</option>
+    </select>
+
+    <select @bind="maxResults" class="form-select w-auto d-inline ms-2">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="30">30</option>
+        <option value="40">40</option>
+        <option value="50">50</option>
+    </select>
+
+    <button type="button" class="btn btn-primary ms-2" @onclick="SearchBooks">Search</button>
+</div>
+
+@if (isLoading)
+{
+    <p>Loading results...</p>
+}
+
+@if (books != null && books.Any())
+{
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Cover</th>
+                <th>Title</th>
+                <th>Authors</th>
+                <th>Year</th>
+                <th>ISBN</th>
+                <th>Select</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var book in books)
+            {
+                <tr>
+                    <td><img src="@book.CoverUrl" width="80" /></td>
+                    <td>@book.Title</td>
+                    <td>@string.Join(", ", book.Author_Name ?? new List<string>())</td>
+                    <td>@book.First_Publish_Year</td>
+                    <td>@(book.Isbn != null ? string.Join(", ", book.Isbn.Take(3)) : "")</td>
+                    <td>
+                        <input type="checkbox" @bind="book.IsSelected" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button class="btn btn-success mt-2" @onclick="ImportSelectedBooks" disabled="@(!books.Any(b => b.IsSelected))">
+        Import Selected
+    </button>
+}
+else if (!isLoading)
+{
+    <p>No results yet. Use the search box above to load.</p>
+}
+
+@code {
+    private string searchQuery = "";
+    private string searchType = "title";
+    private int maxResults = 10;
+    private bool isLoading = false;
+
+    private List<OpenLibraryBookDtoWithSelection> books = new();
+
+    // Checkbox selection + Quant
+    private class OpenLibraryBookDtoWithSelection : OpenLibraryBookDto
+    {
+        public bool IsSelected { get; set; } = false;
+        public int ImportQuantity { get; set; } = 1;
+        public string Category { get; set; } = "Uncategorized";
+        public decimal Price { get; set; } = 10.0M;
+        public string? CoverUrl => Cover_I != null ? $"https://covers.openlibrary.org/b/id/{Cover_I}-M.jpg" : null;
+    }
+
+    private async Task SearchBooks()
+    {
+        Console.WriteLine(OpenLibraryService == null ? "Service is null!" : "Service injected correctly");
+        if (string.IsNullOrWhiteSpace(searchQuery))
+        {
+            // In case of empty search box
+            books.Clear();
+            isLoading = false;
+            return;
+        }
+
+        isLoading = true;
+        StateHasChanged(); // Force Update
+
+        try
+        {
+            var results = await OpenLibraryService.SearchBooksAsync(searchQuery, searchType, maxResults);
+
+            books = results.Select(b => new OpenLibraryBookDtoWithSelection
+            {
+                Title = b.Title,
+                Author_Name = b.Author_Name,
+                First_Publish_Year = b.First_Publish_Year,
+                Isbn = b.Isbn,
+                Cover_I = b.Cover_I,
+                Key = b.Key,
+                ImportQuantity = 1
+            }).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching books: {ex.Message}");
+            books.Clear();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task ImportSelectedBooks()
+    {
+        var selectedBooks = books.Where(b => b.IsSelected).ToList();
+        if (!selectedBooks.Any()) return;
+
+        using var scope = ServiceProvider.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<Grp19OnlineBookStorePE03Context>();
+
+
+        foreach (var bookDto in selectedBooks)
+        {
+            var isbnToCheck = bookDto.Isbn?.FirstOrDefault();
+
+            if (!string.IsNullOrEmpty(isbnToCheck))
+            {
+                var existingBook = await db.Book
+                    .Include(b => b.BookStock)
+                    .FirstOrDefaultAsync(b => b.ISBN == isbnToCheck);
+
+                if (existingBook != null)
+                {
+                    // Update stock
+                    if (existingBook.BookStock != null)
+                    {
+                        existingBook.BookStock.Quantity += bookDto.ImportQuantity;
+                  
+                    }
+                    else
+                    {
+                        db.BookStock.Add(new Classes.BookStock
+                        {
+                            BookId = existingBook.Id,
+                            Quantity = bookDto.ImportQuantity,
+
+                        });
+                    }
+                }
+                else
+                {
+                    // Create new book
+                    var newBook = new Classes.Book
+                    {
+                        Title = bookDto.Title,
+                        Author = bookDto.Author_Name != null ? string.Join(", ", bookDto.Author_Name) : "",
+                        ISBN = isbnToCheck,
+                        PublishYear = bookDto.First_Publish_Year ?? 0,
+                        CoverUrl = bookDto.CoverUrl,
+                        OpenLibraryWorkKey = bookDto.Key,
+                        Category = bookDto.Category,
+                        Price = bookDto.Price,
+                        StaffId = 1
+                    };
+                    db.Book.Add(newBook);
+                    await db.SaveChangesAsync();
+
+                    db.BookStock.Add(new Classes.BookStock
+                    {
+                        BookId = newBook.Id,
+                        Quantity = bookDto.ImportQuantity,
+                
+                    });
+                }
+            }
+            else
+            {
+                //For illegal undocumented books
+                var newBook = new Classes.Book
+                {
+                    Title = bookDto.Title,
+                    Author = bookDto.Author_Name != null ? string.Join(", ", bookDto.Author_Name) : "",
+                    ISBN = null,
+                    PublishYear = bookDto.First_Publish_Year ?? 0,
+                    CoverUrl = bookDto.CoverUrl,
+                    OpenLibraryWorkKey = bookDto.Key,
+                    Category = "Uncategorized",
+                    Price = 10.0M,
+                    StaffId = 1
+                };
+                db.Book.Add(newBook);
+                await db.SaveChangesAsync();
+
+                db.BookStock.Add(new Classes.BookStock
+                {
+                    BookId = newBook.Id,
+                    Quantity = bookDto.ImportQuantity,
+                });
+                // After db.SaveChangesAsync() in ImportSelectedBooks
+                foreach (var book in books)
+                {
+                    book.IsSelected = false;
+                    book.ImportQuantity = 1; // reset to default
+                }
+                StateHasChanged(); // Force UI refresh
+            }
+        }
+
+        await db.SaveChangesAsync();
+        Console.WriteLine($"Imported {selectedBooks.Count} books / updated stock");
+            }
+}
