@@ -1,12 +1,23 @@
 ﻿@page "/books"
+@rendermode InteractiveServer
 
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.CodeAnalysis.Elfie.Diagnostics
 @using Microsoft.EntityFrameworkCore
 @using Grp19OnlineBookStorePE03.Classes
 @using Grp19OnlineBookStorePE03.Data
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.Extensions.Logging
+
+@inject AuthenticationStateProvider AuthStateProvider
+@inject UserManager<OnlineBookStoreUser> UserManager
+@inject ILogger<Book> Logger
 
 @implements IAsyncDisposable
 @inject IDbContextFactory<Grp19OnlineBookStorePE03Context> DbFactory
+@inject AuthenticationStateProvider AuthStateProvider
+@inject UserManager<OnlineBookStoreUser> UserManager
 
 @attribute [Authorize(Roles = "Admin, User")]
 
@@ -145,11 +156,43 @@
 
     // ---------------- USER ACTIONS (STUBS) ----------------
 
-    private void AddToCart(int bookId)
+    private async Task AddToCart(int bookId)
     {
-        // TODO: Implement cart logic
-        Console.WriteLine($"Book {bookId} added to cart");
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (!user.Identity?.IsAuthenticated ?? true)
+        {
+            Logger.LogWarning("User not logged in");
+            return;
+        }
+
+        var userId = UserManager.GetUserId(user)!;
+
+        var existingItem = await context.CartItem
+            .FirstOrDefaultAsync(c => c.BookId == bookId && c.UserId == userId);
+
+        if (existingItem != null)
+        {
+            existingItem.Quantity += 1;
+            Logger.LogInformation("Quantity increased for BookId {BookId}", bookId);
+        }
+        else
+        {
+            context.CartItem.Add(new CartItem
+            {
+                BookId = bookId,
+                UserId = userId,
+                Quantity = 1
+            });
+
+            Logger.LogInformation("New cart item added for BookId {BookId}", bookId);
+        }
+
+        await context.SaveChangesAsync();
     }
+
+
 
     private void AddToWishlist(int bookId)
     {

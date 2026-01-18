@@ -1,0 +1,138 @@
+﻿@page "/cart"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Grp19OnlineBookStorePE03.Classes
+@using Grp19OnlineBookStorePE03.Data
+
+@inject IDbContextFactory<Grp19OnlineBookStorePE03Context> DbFactory
+@inject AuthenticationStateProvider AuthStateProvider
+@inject UserManager<OnlineBookStoreUser> UserManager
+@inject ILogger<Cart> Logger
+
+@attribute [Authorize(Roles = "User, Admin")]
+
+<h1>Your Cart</h1>
+
+@if (cartItems == null)
+{
+    <p>Loading cart...</p>
+}
+else if (!cartItems.Any())
+{
+
+    <p>Your cart is empty.</p>
+}
+else
+{
+    <table class="table">
+        <thead> <tr> <th>Book</th> <th>Price</th> <th>Qty</th> <th>Subtotal</th> <th></th> </tr> </thead>
+        <tbody>
+            @foreach (var item in cartItems)
+            {
+                <tr>
+                    <td>@item.Book?.BookName</td>
+                    <td>$@item.Book?.Price</td>
+                    <td>
+                        <button class="btn btn-sm" @onclick="() => DecreaseQty(item.CartItemId)">-</button>
+                        @item.Quantity
+                        <button class="btn btn-sm" @onclick="() => IncreaseQty(item.CartItemId)">+</button>
+                    </td>
+                    <td>$@(item.Quantity * (item.Book?.Price ?? 0))</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" @onclick="() => RemoveItem(item.CartItemId)">Remove</button>
+                    </td>
+                </tr>
+            }
+    </tbody>
+</table>
+
+<h3> Total: $@TotalPrice </h3>
+
+
+}
+@code {
+    private Grp19OnlineBookStorePE03Context context = default!;
+    private List<CartItem>? cartItems;
+    private string userId = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        context = DbFactory.CreateDbContext();
+
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        userId = UserManager.GetUserId(user)!;
+
+        await LoadCart();
+    }
+
+    private async Task LoadCart()
+    {
+        cartItems = await context.CartItem
+            .Include(c => c.Book)
+            .Where(c => c.UserId == userId)
+            .ToListAsync();
+    }
+
+    private decimal TotalPrice =>
+        cartItems?.Sum(c => c.Quantity * (c.Book?.Price ?? 0)) ?? 0;
+
+    private async Task IncreaseQty(int cartItemId)
+    {
+        var item = await context.CartItem
+            .FirstOrDefaultAsync(c => c.CartItemId == cartItemId && c.UserId == userId);
+
+        if (item == null) return;
+
+        item.Quantity++;
+        await context.SaveChangesAsync();
+        await LoadCart();
+    }
+
+    private async Task DecreaseQty(int cartItemId)
+    {
+        var item = await context.CartItem
+            .FirstOrDefaultAsync(c => c.CartItemId == cartItemId && c.UserId == userId);
+
+        if (item == null)
+            return;
+
+        if (item.Quantity > 1)
+        {
+            item.Quantity--;
+        }
+        else
+        {
+            context.CartItem.Remove(item);
+        }
+
+        await context.SaveChangesAsync();
+        await LoadCart();
+    }
+
+    private async Task RemoveItem(int cartItemId)
+    {
+        Console.WriteLine($"Trying to remove {cartItemId}");
+
+        var item = await context.CartItem
+            .Where(c => c.UserId == userId)
+            .FirstOrDefaultAsync(c => c.CartItemId == cartItemId);
+
+        if (item == null)
+        {
+            Console.WriteLine("Item NOT found");
+            return;
+        }
+
+        context.CartItem.Remove(item);
+        await context.SaveChangesAsync();
+
+        Console.WriteLine("Item REMOVED");
+
+        await LoadCart();
+    }
+}
