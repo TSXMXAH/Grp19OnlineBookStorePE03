@@ -10,15 +10,11 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.Extensions.Logging
 
-@inject AuthenticationStateProvider AuthStateProvider
-@inject UserManager<OnlineBookStoreUser> UserManager
-@inject ILogger<Book> Logger
-
 @implements IAsyncDisposable
 @inject IDbContextFactory<Grp19OnlineBookStorePE03Context> DbFactory
 @inject AuthenticationStateProvider AuthStateProvider
 @inject UserManager<OnlineBookStoreUser> UserManager
-
+@inject ILogger<Book> Logger
 @attribute [Authorize(Roles = "Admin, User")]
 
 <PageTitle>Books</PageTitle>
@@ -194,10 +190,29 @@
 
 
 
-    private void AddToWishlist(int bookId)
+    private async Task AddToWishlist(int bookId)
     {
-        // TODO: Implement wishlist logic
-        Console.WriteLine($"Book {bookId} added to wishlist");
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (!user.Identity?.IsAuthenticated ?? true)
+            return;
+
+        var userId = UserManager.GetUserId(user)!;
+
+        bool exists = await context.WishlistItem
+            .AnyAsync(w => w.BookId == bookId && w.UserId == userId);
+
+        if (exists)
+            return;
+
+        context.WishlistItem.Add(new WishlistItem
+        {
+            BookId = bookId,
+            UserId = userId
+        });
+
+        await context.SaveChangesAsync();
     }
 
     public async ValueTask DisposeAsync()

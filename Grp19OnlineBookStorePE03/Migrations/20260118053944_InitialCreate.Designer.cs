@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Grp19OnlineBookStorePE03.Migrations
 {
     [DbContext(typeof(Grp19OnlineBookStorePE03Context))]
-    [Migration("20260106032031_SeedUserRole")]
-    partial class SeedUserRole
+    [Migration("20260118053944_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.22")
+                .HasAnnotation("ProductVersion", "8.0.23")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -82,6 +82,31 @@ namespace Grp19OnlineBookStorePE03.Migrations
                             Price = 16.50m,
                             StaffId = 1
                         });
+                });
+
+            modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.CartItem", b =>
+                {
+                    b.Property<int>("CartItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CartItemId"));
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CartItemId");
+
+                    b.HasIndex("BookId");
+
+                    b.ToTable("CartItem");
                 });
 
             modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.Customer", b =>
@@ -293,6 +318,28 @@ namespace Grp19OnlineBookStorePE03.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.WishlistItem", b =>
+                {
+                    b.Property<int>("WishlistItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WishlistItemId"));
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("WishlistItemId");
+
+                    b.HasIndex("BookId");
+
+                    b.ToTable("WishlistItem");
+                });
+
             modelBuilder.Entity("Grp19OnlineBookStorePE03.Data.OnlineBookStoreUser", b =>
                 {
                     b.Property<string>("Id")
@@ -368,7 +415,7 @@ namespace Grp19OnlineBookStorePE03.Migrations
                         {
                             Id = "c1a2b3c4-d5e6-4789-8901-234567890abc",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "25cc7bb2-ea72-4b7e-a622-e6094c552851",
+                            ConcurrencyStamp = "0ef1933b-3ff4-4230-b829-c5ae31c86386",
                             Email = "admin@localhost.com",
                             EmailConfirmed = true,
                             FirstName = "Admin",
@@ -376,9 +423,9 @@ namespace Grp19OnlineBookStorePE03.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@LOCALHOST.COM",
                             NormalizedUserName = "ADMIN@LOCALHOST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFlfM47EWwMsaQdcXsR+tFxHUnh+hY+bmvr1riYwmDXmk0QLWUVqFER26aCZHhoEyA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGtXGAfDRqCqKGY6w7DlDSDwWHBBBjKEciJTLvLZ3hhR5n53PCdkw4MsicHFRXftoA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "663982aa-bfc6-4b90-b779-1c79107528b3",
+                            SecurityStamp = "8b20df5a-11ed-4190-b2f3-e35a6fa06c53",
                             TwoFactorEnabled = false,
                             UserName = "admin@localhost.com"
                         });
@@ -549,6 +596,17 @@ namespace Grp19OnlineBookStorePE03.Migrations
                     b.Navigation("Staff");
                 });
 
+            modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.CartItem", b =>
+                {
+                    b.HasOne("Grp19OnlineBookStorePE03.Classes.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+                });
+
             modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.Misc", b =>
                 {
                     b.HasOne("Grp19OnlineBookStorePE03.Classes.Staff", "Staff")
@@ -601,6 +659,17 @@ namespace Grp19OnlineBookStorePE03.Migrations
                         .IsRequired();
 
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.WishlistItem", b =>
+                {
+                    b.HasOne("Grp19OnlineBookStorePE03.Classes.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

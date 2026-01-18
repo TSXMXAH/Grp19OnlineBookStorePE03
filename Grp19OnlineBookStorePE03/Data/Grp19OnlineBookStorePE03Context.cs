@@ -15,7 +15,7 @@ namespace Grp19OnlineBookStorePE03.Data
         public DbSet<Grp19OnlineBookStorePE03.Classes.OrderItem> OrderItem { get; set; } = default!;
         public DbSet<Grp19OnlineBookStorePE03.Classes.Payment> Payment { get; set; } = default!;
         public DbSet<Grp19OnlineBookStorePE03.Classes.CartItem> CartItem{ get; set; } = default!;
-
+        public DbSet<Grp19OnlineBookStorePE03.Classes.WishlistItem> WishlistItem { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

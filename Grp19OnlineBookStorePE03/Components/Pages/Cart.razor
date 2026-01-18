@@ -14,6 +14,68 @@
 
 @attribute [Authorize(Roles = "User, Admin")]
 
+<style>
+    .cart-container {
+        width: 90%;
+        margin: 40px auto;
+    }
+
+    .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .cart-info {
+        width: 50%;
+        line-height: 1.6;
+    }
+
+    .cart-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .qty-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .qty-controls button {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+    .btn-remove {
+        background: #d9534f;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .cart-summary {
+        margin-top: 30px;
+        text-align: right;
+        font-size: 18px;
+        font-weight: bold;
+    }
+</style>
+
+
 <h1>Your Cart</h1>
 
 @if (cartItems == null)
@@ -27,27 +89,49 @@ else if (!cartItems.Any())
 }
 else
 {
-    <table class="table">
-        <thead> <tr> <th>Book</th> <th>Price</th> <th>Qty</th> <th>Subtotal</th> <th></th> </tr> </thead>
-        <tbody>
+    <div class="cart-container">
+
+        @if (cartItems == null)
+        {
+            <p>Loading cart...</p>
+        }
+        else if (!cartItems.Any())
+        {
+            <p>Your cart is empty.</p>
+        }
+        else
+        {
             @foreach (var item in cartItems)
             {
-                <tr>
-                    <td>@item.Book?.BookName</td>
-                    <td>$@item.Book?.Price</td>
-                    <td>
-                        <button class="btn btn-sm" @onclick="() => DecreaseQty(item.CartItemId)">-</button>
-                        @item.Quantity
-                        <button class="btn btn-sm" @onclick="() => IncreaseQty(item.CartItemId)">+</button>
-                    </td>
-                    <td>$@(item.Quantity * (item.Book?.Price ?? 0))</td>
-                    <td>
-                        <button class="btn btn-danger btn-sm" @onclick="() => RemoveItem(item.CartItemId)">Remove</button>
-                    </td>
-                </tr>
+                <div class="cart-item">
+
+                    <div class="cart-info">
+                        <strong>@item.Book?.BookName</strong><br />
+                        Price: $@item.Book?.Price<br />
+                        Subtotal: $@(item.Quantity * (item.Book?.Price ?? 0))
+                    </div>
+
+                    <div class="cart-actions">
+                        <div class="qty-controls">
+                            <button @onclick="() => DecreaseQty(item.CartItemId)">−</button>
+                            <span>@item.Quantity</span>
+                            <button @onclick="() => IncreaseQty(item.CartItemId)">+</button>
+                        </div>
+
+                        <button class="btn-remove"
+                                @onclick="() => RemoveItem(item.CartItemId)">
+                            Remove
+                        </button>
+                    </div>
+
+                </div>
             }
-    </tbody>
-</table>
+
+            <div class="cart-summary">
+                Total: $@TotalPrice
+            </div>
+        }
+    </div>
 
 <h3> Total: $@TotalPrice </h3>
 
