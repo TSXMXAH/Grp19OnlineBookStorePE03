@@ -11,6 +11,7 @@
 @inject IDbContextFactory<Grp19OnlineBookStorePE03Context> DbFactory
 @inject AuthenticationStateProvider AuthStateProvider
 @inject UserManager<OnlineBookStoreUser> UserManager
+@inject NavigationManager NavigationManager
 
 @attribute [Authorize(Roles = "User,Admin")]
 
@@ -39,19 +40,10 @@ else
             @foreach (var item in cartItems)
             {
                 <tr>
-                    <td>
-                        @(item.Book != null ? item.Book.BookName : item.Misc!.MiscName)
-                    </td>
+                    <td>@(item.Book != null ? item.Book.Title : item.Misc!.MiscName)</td>
                     <td>@item.Quantity</td>
-                    <td>
-                        $@(item.Book != null ? item.Book.Price : item.Misc!.Price)
-                    </td>
-                    <td>
-                        $@(
-                        item.Quantity *
-                        (item.Book != null ? item.Book.Price : item.Misc!.Price)
-                                )
-                    </td>
+                    <td>$@(item.Book != null ? item.Book.Price : item.Misc!.Price)</td>
+                    <td>$@(item.Quantity * (item.Book != null ? item.Book.Price : item.Misc!.Price))</td>
                 </tr>
             }
         </tbody>
@@ -59,34 +51,71 @@ else
 
     <h3>Total: $@TotalPrice</h3>
 
-    <button class="btn btn-success" disabled>
-        PAY NOW (Coming next)
+    @if (paymentMessage != null)
+    {
+        <div class="alert alert-success">@paymentMessage</div>
+    }
+
+    <button class="btn btn-success" @onclick="PayNow" disabled="@isProcessing">
+        @(isProcessing ? "Processing..." : "PAY NOW")
     </button>
 }
-@code{
+
+@code {
     private Grp19OnlineBookStorePE03Context context = default!;
-private List<CartItem>? cartItems;
-private string userId = "";
+    private List<CartItem>? cartItems;
+    private string userId = "";
+    private bool isProcessing = false;
+    private string? paymentMessage;
 
-protected override async Task OnInitializedAsync()
-{
-    context = DbFactory.CreateDbContext();
+    protected override async Task OnInitializedAsync()
+    {
+        context = DbFactory.CreateDbContext();
 
-    var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-    var user = authState.User;
-    userId = UserManager.GetUserId(user)!;
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        userId = UserManager.GetUserId(user)!;
 
-    cartItems = await context.CartItem
-        .Include(c => c.Book)
-        .Include(c => c.Misc)
-        .Where(c => c.UserId == userId)
-        .ToListAsync();
-}
+        await LoadCart();
+    }
 
-private decimal TotalPrice =>
-    cartItems?.Sum(c =>
-        c.Quantity *
-        (c.Book != null ? c.Book.Price : c.Misc!.Price)
-    ) ?? 0;
+    private async Task LoadCart()
+    {
+        cartItems = await context.CartItem
+            .Include(c => c.Book)
+            .Include(c => c.Misc)
+            .Where(c => c.UserId == userId)
+            .ToListAsync();
+    }
 
+    private decimal TotalPrice =>
+        cartItems?.Sum(c =>
+            c.Quantity * (c.Book != null ? c.Book.Price : c.Misc!.Price)
+        ) ?? 0;
+
+    private async Task PayNow()
+    {
+        if (cartItems == null || !cartItems.Any())
+            return;
+
+        isProcessing = true;
+
+        // Create payment record
+        var payment = new Payment
+        {
+            UserId = userId,
+            AmountPaid = TotalPrice,
+            PaymentDate = DateTime.UtcNow
+        };
+        context.Payment.Add(payment);
+
+        // Remove cart items
+        context.CartItem.RemoveRange(cartItems);
+
+        await context.SaveChangesAsync();
+
+        paymentMessage = $"Payment of ${TotalPrice} successful! Thank you for your purchase.";
+        cartItems.Clear();
+        isProcessing = false;
+    }
 }

@@ -29,8 +29,8 @@
 }
 
 .wishlist-cover {
-    width: 120px;
-    height: 160px;
+    width: 200px;
+    height: 300px;
     background: #ccc;
     display: flex;
     justify-content: center;
@@ -95,13 +95,16 @@ else
             <div class="wishlist-card">
 
                 <div class="wishlist-cover">
-                    @(item.Book != null ? "Book Cover" : "Misc Item")
+                    <!--@* @(item.Book != null ? "Book Cover" : "Misc Item") *@-->
+                     <a href="@item.Book.CoverUrl" target="_blank">
+                            <img src="@item.Book.CoverUrl" alt="Cover for @item.Book.Title" />
+                        </a>
                 </div>
 
                 <div class="wishlist-info">
                     @if (item.Book != null)
                     {
-                        <h3>@item.Book.BookName</h3>
+                        <h3>@item.Book.Title</h3>
                         <p><strong>Author:</strong> @item.Book.Author</p>
                         <p><strong>Category:</strong> @item.Book.Category</p>
                         <p class="price">$@item.Book.Price</p>

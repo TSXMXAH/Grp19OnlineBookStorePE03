@@ -336,6 +336,9 @@ namespace Grp19OnlineBookStorePE03.Migrations
                     b.Property<DateTime>("PaymentDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId")
@@ -479,8 +482,7 @@ namespace Grp19OnlineBookStorePE03.Migrations
                         {
                             Id = "c1a2b3c4-d5e6-4789-8901-234567890abc",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f76215e9-81e0-4622-a34e-28d92aadb917",
-                            ConcurrencyStamp = "5a87ea7d-dca6-4d17-b7c7-f11d29b9ff70",
+                            ConcurrencyStamp = "bcfaad18-183e-4a74-a6e4-fce9b40fcb0f",
                             Email = "admin@localhost.com",
                             EmailConfirmed = true,
                             FirstName = "Admin",
@@ -488,12 +490,9 @@ namespace Grp19OnlineBookStorePE03.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@LOCALHOST.COM",
                             NormalizedUserName = "ADMIN@LOCALHOST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEO9yieCnEZDJJYQH3mZ4ZtrwQMUWA6dplJcYio8lisI5Ekb2t2BPwJebQQUzOyhYBQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBE+bvELwNxH819rQH9nuHwlKiO/DYVltgNl3Q2G4svh5hIxLEpY3nGTvmn2v5DNyQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "2a26b19f-8b63-43a3-92fa-a0e90be479fe",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHhvz6GvG3//DNekSw8Td7a/AayAhONpPNZUhyEpfEgFmMwwH1CLo/6I0g63SVrM3g==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "4c8efe82-594b-4d33-ba4e-33ba89c7a324",
+                            SecurityStamp = "cb9c3d24-1b43-4c13-a09a-7bd6847db4f8",
                             TwoFactorEnabled = false,
                             UserName = "admin@localhost.com"
                         });
@@ -673,6 +672,8 @@ namespace Grp19OnlineBookStorePE03.Migrations
                         .IsRequired();
 
                     b.Navigation("Book");
+                });
+
             modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.CartItem", b =>
                 {
                     b.HasOne("Grp19OnlineBookStorePE03.Classes.Book", "Book")

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Grp19OnlineBookStorePE03.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Endgame : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -218,8 +218,12 @@ namespace Grp19OnlineBookStorePE03.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    BookName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Author = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ISBN = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PublishYear = table.Column<int>(type: "int", nullable: false),
+                    CoverUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OpenLibraryWorkKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     StaffId = table.Column<int>(type: "int", nullable: false)
@@ -279,13 +283,34 @@ namespace Grp19OnlineBookStorePE03.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BookStock",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BookId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BookStock", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BookStock_Book_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Book",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CartItem",
                 columns: table => new
                 {
                     CartItemId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BookId = table.Column<int>(type: "int", nullable: false),
+                    BookId = table.Column<int>(type: "int", nullable: true),
+                    MiscId = table.Column<int>(type: "int", nullable: true),
                     Quantity = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -295,28 +320,12 @@ namespace Grp19OnlineBookStorePE03.Migrations
                         name: "FK_CartItem_Book_BookId",
                         column: x => x.BookId,
                         principalTable: "Book",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "WishlistItem",
-                columns: table => new
-                {
-                    WishlistItemId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BookId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WishlistItem", x => x.WishlistItemId);
+                        principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_WishlistItem_Book_BookId",
-                        column: x => x.BookId,
-                        principalTable: "Book",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_CartItem_Misc_MiscId",
+                        column: x => x.MiscId,
+                        principalTable: "Misc",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -351,6 +360,33 @@ namespace Grp19OnlineBookStorePE03.Migrations
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "WishlistItem",
+                columns: table => new
+                {
+                    WishlistItemId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BookId = table.Column<int>(type: "int", nullable: true),
+                    MiscId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WishlistItem", x => x.WishlistItemId);
+                    table.ForeignKey(
+                        name: "FK_WishlistItem_Book_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Book",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_WishlistItem_Misc_MiscId",
+                        column: x => x.MiscId,
+                        principalTable: "Misc",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
@@ -363,7 +399,7 @@ namespace Grp19OnlineBookStorePE03.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "c1a2b3c4-d5e6-4789-8901-234567890abc", 0, "0ef1933b-3ff4-4230-b829-c5ae31c86386", "admin@localhost.com", true, "Admin", "User", false, null, "ADMIN@LOCALHOST.COM", "ADMIN@LOCALHOST.COM", "AQAAAAIAAYagAAAAEGtXGAfDRqCqKGY6w7DlDSDwWHBBBjKEciJTLvLZ3hhR5n53PCdkw4MsicHFRXftoA==", null, false, "8b20df5a-11ed-4190-b2f3-e35a6fa06c53", false, "admin@localhost.com" });
+                values: new object[] { "c1a2b3c4-d5e6-4789-8901-234567890abc", 0, "afe2dc96-f24f-4934-934c-4c6c357a58c5", "admin@localhost.com", true, "Admin", "User", false, null, "ADMIN@LOCALHOST.COM", "ADMIN@LOCALHOST.COM", "AQAAAAIAAYagAAAAEEjz+eOb9GQun956wDr/Z8igJMr+P0Ru6TgypKK2z49+17W2xdzISnofuERdUIJTug==", null, false, "035c2392-a7cf-4a3b-9b9c-be75c4eba880", false, "admin@localhost.com" });
 
             migrationBuilder.InsertData(
                 table: "Customer",
@@ -386,12 +422,12 @@ namespace Grp19OnlineBookStorePE03.Migrations
 
             migrationBuilder.InsertData(
                 table: "Book",
-                columns: new[] { "Id", "Author", "BookName", "Category", "Price", "StaffId" },
+                columns: new[] { "Id", "Author", "Category", "CoverUrl", "ISBN", "OpenLibraryWorkKey", "Price", "PublishYear", "StaffId", "Title" },
                 values: new object[,]
                 {
-                    { 1, "Holly Black", "The Cruel Prince", "Romance", 17.20m, 1 },
-                    { 2, "Vince Elson", "The Laughing King", "Comedy", 18.50m, 1 },
-                    { 3, "Holly Black", "The Queen Of Nothing", "Romance", 16.50m, 1 }
+                    { 1, "Holly Black", "Romance", null, null, null, 17.20m, 0, 1, "The Cruel Prince" },
+                    { 2, "Vince Elson", "Comedy", null, null, null, 18.50m, 0, 1, "The Laughing King" },
+                    { 3, "Holly Black", "Romance", null, null, null, 16.50m, 0, 1, "The Queen Of Nothing" }
                 });
 
             migrationBuilder.InsertData(
@@ -402,6 +438,16 @@ namespace Grp19OnlineBookStorePE03.Migrations
                     { 1, "Stationary", " PIX Black Ballpoint Pen", 450.0m, 2 },
                     { 2, "Office Supplies", "Canon Original Black Cartridge", 33.00m, 2 },
                     { 3, "Wellness", "Hitachi HMG-900 Precision Massage Gun", 67.50m, 2 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "BookStock",
+                columns: new[] { "Id", "BookId", "Quantity" },
+                values: new object[,]
+                {
+                    { 1, 1, 5 },
+                    { 2, 2, 3 },
+                    { 3, 3, 7 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -449,9 +495,20 @@ namespace Grp19OnlineBookStorePE03.Migrations
                 column: "StaffId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BookStock_BookId",
+                table: "BookStock",
+                column: "BookId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CartItem_BookId",
                 table: "CartItem",
                 column: "BookId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CartItem_MiscId",
+                table: "CartItem",
+                column: "MiscId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Misc_StaffId",
@@ -488,6 +545,11 @@ namespace Grp19OnlineBookStorePE03.Migrations
                 name: "IX_WishlistItem_BookId",
                 table: "WishlistItem",
                 column: "BookId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WishlistItem_MiscId",
+                table: "WishlistItem",
+                column: "MiscId");
         }
 
         /// <inheritdoc />
@@ -509,6 +571,9 @@ namespace Grp19OnlineBookStorePE03.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "BookStock");
+
+            migrationBuilder.DropTable(
                 name: "CartItem");
 
             migrationBuilder.DropTable(
@@ -527,13 +592,13 @@ namespace Grp19OnlineBookStorePE03.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Misc");
-
-            migrationBuilder.DropTable(
                 name: "Order");
 
             migrationBuilder.DropTable(
                 name: "Book");
+
+            migrationBuilder.DropTable(
+                name: "Misc");
 
             migrationBuilder.DropTable(
                 name: "Customer");
