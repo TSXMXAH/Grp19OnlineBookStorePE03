@@ -1,0 +1,223 @@
+﻿@page "/cart"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Grp19OnlineBookStorePE03.Classes
+@using Grp19OnlineBookStorePE03.Data
+
+@inject IDbContextFactory<Grp19OnlineBookStorePE03Context> DbFactory
+@inject AuthenticationStateProvider AuthStateProvider
+@inject UserManager<OnlineBookStoreUser> UserManager
+@inject ILogger<Cart> Logger
+
+@attribute [Authorize(Roles = "User, Admin")]
+
+<style>
+    .cart-container {
+        width: 90%;
+        margin: 40px auto;
+    }
+
+    .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .cart-info {
+        width: 50%;
+        line-height: 1.6;
+    }
+
+    .cart-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .qty-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .qty-controls button {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+    .btn-remove {
+        background: #d9534f;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .cart-summary {
+        margin-top: 30px;
+        text-align: right;
+        font-size: 18px;
+        font-weight: bold;
+    }
+</style>
+
+
+<h1>Your Cart</h1>
+<div class="cart-container">
+
+    @if (cartItems == null)
+        {
+        <p>Loading cart...</p>
+    }
+    else if (!cartItems.Any())
+    {
+    <p>Your cart is empty.</p>
+    }
+    else
+    {
+    @foreach (var item in cartItems)
+    {
+                <div class="cart-item">
+                    <div class="cart-info">
+                        <strong>
+                            @(item.Book != null
+                                            ? item.Book.BookName
+                                            : item.Misc?.MiscName)
+                        </strong><br />
+
+                        Price: $@(
+                        item.Book != null
+                        ? item.Book.Price
+                        : item.Misc?.Price ?? 0
+                        )<br />
+
+                        Subtotal: $@(
+                        item.Quantity *
+                        (item.Book?.Price ?? item.Misc?.Price ?? 0)
+                        )
+                    </div>
+                    <div class="cart-actions">
+                        <div class="qty-controls">
+                            <button @onclick="() => DecreaseQty(item.CartItemId)">−</button>
+                            <span>@item.Quantity</span>
+                            <button @onclick="() => IncreaseQty(item.CartItemId)">+</button>
+                        </div>
+                        <button class="btn-remove"
+                                @onclick="() => RemoveItem(item.CartItemId)">
+                            Remove
+                        </button>
+                    </div>
+
+                </div>
+            }
+
+            <div class="cart-summary">
+                Total: $@TotalPrice
+            </div>
+        <a href="/checkout" class="btn btn-success">Proceed to Checkout</a>
+        }
+    </div>
+
+<h3> Total: $@TotalPrice </h3>
+@code {
+    private Grp19OnlineBookStorePE03Context context = default!;
+    private List<CartItem>? cartItems;
+    private string userId = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        context = DbFactory.CreateDbContext();
+
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        userId = UserManager.GetUserId(user)!;
+
+        await LoadCart();
+    }
+
+    private async Task LoadCart()
+    {
+        cartItems = await context.CartItem
+            .Include(c => c.Book)
+            .Include(c => c.Misc)
+            .Where(c => c.UserId == userId)
+            .ToListAsync();
+    }
+
+    private decimal TotalPrice =>
+    cartItems?.Sum(c =>
+        c.Quantity *
+        (c.Book?.Price ?? c.Misc?.Price ?? 0)
+    ) ?? 0;
+
+
+    private async Task IncreaseQty(int cartItemId)
+    {
+        var item = await context.CartItem
+            .FirstOrDefaultAsync(c => c.CartItemId == cartItemId && c.UserId == userId);
+
+        if (item == null) return;
+
+        item.Quantity++;
+        await context.SaveChangesAsync();
+        await LoadCart();
+    }
+
+    private async Task DecreaseQty(int cartItemId)
+    {
+        var item = await context.CartItem
+            .FirstOrDefaultAsync(c => c.CartItemId == cartItemId && c.UserId == userId);
+
+        if (item == null)
+            return;
+
+        if (item.Quantity > 1)
+        {
+            item.Quantity--;
+        }
+        else
+        {
+            context.CartItem.Remove(item);
+        }
+
+        await context.SaveChangesAsync();
+        await LoadCart();
+    }
+
+    private async Task RemoveItem(int cartItemId)
+    {
+        Console.WriteLine($"Trying to remove {cartItemId}");
+
+        var item = await context.CartItem
+            .Where(c => c.UserId == userId)
+            .FirstOrDefaultAsync(c => c.CartItemId == cartItemId);
+
+        if (item == null)
+        {
+            Console.WriteLine("Item NOT found");
+            return;
+        }
+
+        context.CartItem.Remove(item);
+        await context.SaveChangesAsync();
+
+        Console.WriteLine("Item REMOVED");
+
+        await LoadCart();
+    }
+}

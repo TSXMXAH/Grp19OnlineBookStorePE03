@@ -1,0 +1,210 @@
+﻿@page "/wishlist"
+@rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Grp19OnlineBookStorePE03.Classes
+@using Grp19OnlineBookStorePE03.Data
+
+@inject IDbContextFactory<Grp19OnlineBookStorePE03Context> DbFactory
+@inject AuthenticationStateProvider AuthStateProvider
+@inject UserManager<OnlineBookStoreUser> UserManager
+
+<style>
+    .wishlist-container {
+    width: 90%;
+    margin: 40px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.wishlist-card {
+    display: flex;
+    gap: 20px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    align-items: center;
+}
+
+.wishlist-cover {
+    width: 120px;
+    height: 160px;
+    background: #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 13px;
+}
+
+.wishlist-info {
+    flex: 1;
+    line-height: 1.6;
+}
+
+.wishlist-info h3 {
+    margin-bottom: 8px;
+}
+
+.price {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.wishlist-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 160px;
+}
+
+.btn {
+    background: red;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.btn.outline {
+    background: white;
+    color: red;
+    border: 2px solid red;
+}
+</style>
+
+<h1>Your Wishlist</h1>
+
+@if (items == null)
+{
+    <p>Loading...</p>
+}
+else if (!items.Any())
+{
+    <p>Your wishlist is empty.</p>
+}
+else
+{
+    <div class="wishlist-container">
+        @foreach (var item in items)
+        {
+            <div class="wishlist-card">
+
+                <div class="wishlist-cover">
+                    @(item.Book != null ? "Book Cover" : "Misc Item")
+                </div>
+
+                <div class="wishlist-info">
+                    @if (item.Book != null)
+                    {
+                        <h3>@item.Book.BookName</h3>
+                        <p><strong>Author:</strong> @item.Book.Author</p>
+                        <p><strong>Category:</strong> @item.Book.Category</p>
+                        <p class="price">$@item.Book.Price</p>
+                    }
+                    else if (item.Misc != null)
+                    {
+                        <h3>@item.Misc.MiscName</h3>
+                        <p><strong>Category:</strong> @item.Misc.Category</p>
+                        <p class="price">$@item.Misc.Price</p>
+                    }
+
+                </div>
+            </div>
+
+            <div class="wishlist-actions">
+                <button class="btn"
+                        @onclick="() => MoveToCart(item.WishlistItemId)">
+                    ADD TO CART
+                </button>
+
+                <button class="btn outline"
+                        @onclick="() => Remove(item.WishlistItemId)">
+                    REMOVE
+                </button>
+            </div>
+        }
+    </div>
+
+}
+
+@code {
+    private Grp19OnlineBookStorePE03Context context = default!;
+    private List<WishlistItem> wishlistItems = new();
+    private string userId = "";  
+    private List<WishlistItem>? items;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        context = DbFactory.CreateDbContext();
+
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var userId = UserManager.GetUserId(authState.User)!;
+
+        items = await context.WishlistItem
+            .Include(w => w.Book)
+            .Include(w => w.Misc)
+            .Where(w => w.UserId == userId)
+            .ToListAsync();
+    }
+
+    private async Task Remove(int wishlistItemId)
+    {
+        var item = await context.WishlistItem.FindAsync(wishlistItemId);
+        if (item == null) return;
+
+        context.WishlistItem.Remove(item);
+        await context.SaveChangesAsync();
+
+        items!.Remove(item);
+    }
+    private async Task LoadWishlist()
+    {
+        wishlistItems = await context.WishlistItem
+            .Include(w => w.Book)
+            .Include(w => w.Misc)
+            .Where(w => w.UserId == userId)
+            .ToListAsync();
+    }
+
+    private async Task MoveToCart(int wishlistItemId)
+    {
+        var wishlistItem = await context.WishlistItem
+            .Include(w => w.Book)
+            .FirstOrDefaultAsync(w => w.WishlistItemId == wishlistItemId);
+
+        if (wishlistItem == null)
+            return;
+
+        var cartItem = await context.CartItem
+            .FirstOrDefaultAsync(c =>
+                c.BookId == wishlistItem.BookId &&
+                c.UserId == wishlistItem.UserId);
+
+        if (cartItem != null)
+        {
+            cartItem.Quantity += 1;
+        }
+        else
+        {
+            context.CartItem.Add(new CartItem
+            {
+                BookId = wishlistItem.BookId,
+                UserId = wishlistItem.UserId,
+                Quantity = 1
+            });
+        }
+
+        context.WishlistItem.Remove(wishlistItem);
+
+        await context.SaveChangesAsync();
+
+        await LoadWishlist(); 
+    }
+
+}

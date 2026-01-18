@@ -1,10 +1,16 @@
 ﻿@page "/"
-
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Authorization
 @using Grp19OnlineBookStorePE03.Classes
 @using Grp19OnlineBookStorePE03.Data
 @using Microsoft.EntityFrameworkCore
 
 @inject Grp19OnlineBookStorePE03Context DbContext
+@inject AuthenticationStateProvider AuthStateProvider
+@inject UserManager<OnlineBookStoreUser> UserManager
+
 
 <style>
     .section {
@@ -90,11 +96,17 @@
                         Category: @book.Category<br /><br />
                         <strong>$@book.Price</strong>
                     </div>
-
                     <div class="card-buttons">
-                        <button class="btn">ADD TO CART</button>
-                        <button class="btn">WISHLIST</button>
+                        <AuthorizeView Roles="User,Admin">
+                            <button class="btn" @onclick="() => AddBookToCart(book.Id)">
+                                ADD TO CART
+                            </button>
+                            <button class="btn" @onclick="() => AddBookToWishlist(book.Id)">
+                                WISHLIST
+                            </button>
+                        </AuthorizeView>
                     </div>
+
                 </div>
                  }
         </div>
@@ -124,9 +136,16 @@
                     </div>
 
                     <div class="card-buttons">
-                        <button class="btn">ADD TO CART</button>
-                        <button class="btn">WISHLIST</button>
+                        <AuthorizeView Roles="User,Admin">
+                            <button class="btn" @onclick="() => AddMiscToCart(item.Id)">
+                                ADD TO CART
+                            </button>
+                            <button class="btn" @onclick="() => AddMiscToWishlist(item.Id)">
+                                WISHLIST
+                            </button>
+                        </AuthorizeView>
                     </div>
+
                 </div>
             }
         </div>
@@ -149,4 +168,99 @@
             .Take(3)
             .ToListAsync();
     }
+    private async Task<string?> GetUserIdAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (!user.Identity?.IsAuthenticated ?? true)
+            return null;
+
+        return UserManager.GetUserId(user);
+    }
+    private async Task AddBookToCart(int bookId)
+    {
+        var userId = await GetUserIdAsync();
+        if (userId == null) return;
+
+        var existing = await DbContext.CartItem
+            .FirstOrDefaultAsync(c => c.UserId == userId && c.BookId == bookId);
+
+        if (existing != null)
+        {
+            existing.Quantity++;
+        }
+        else
+        {
+            DbContext.CartItem.Add(new CartItem
+            {
+                UserId = userId,
+                BookId = bookId,
+                Quantity = 1
+            });
+        }
+
+        await DbContext.SaveChangesAsync();
+    }
+    private async Task AddMiscToCart(int miscId)
+    {
+        var userId = await GetUserIdAsync();
+        if (userId == null) return;
+
+        var existing = await DbContext.CartItem
+            .FirstOrDefaultAsync(c => c.UserId == userId && c.MiscId == miscId);
+
+        if (existing != null)
+        {
+            existing.Quantity++;
+        }
+        else
+        {
+            DbContext.CartItem.Add(new CartItem
+            {
+                UserId = userId,
+                MiscId = miscId,
+                Quantity = 1
+            });
+        }
+
+        await DbContext.SaveChangesAsync();
+    }
+    private async Task AddBookToWishlist(int bookId)
+    {
+        var userId = await GetUserIdAsync();
+        if (userId == null) return;
+
+        bool exists = await DbContext.WishlistItem
+            .AnyAsync(w => w.UserId == userId && w.BookId == bookId);
+
+        if (exists) return;
+
+        DbContext.WishlistItem.Add(new WishlistItem
+        {
+            UserId = userId,
+            BookId = bookId
+        });
+
+        await DbContext.SaveChangesAsync();
+    }
+    private async Task AddMiscToWishlist(int miscId)
+    {
+        var userId = await GetUserIdAsync();
+        if (userId == null) return;
+
+        bool exists = await DbContext.WishlistItem
+            .AnyAsync(w => w.UserId == userId && w.MiscId == miscId);
+
+        if (exists) return;
+
+        DbContext.WishlistItem.Add(new WishlistItem
+        {
+            UserId = userId,
+            MiscId = miscId
+        });
+
+        await DbContext.SaveChangesAsync();
+    }
+
 }

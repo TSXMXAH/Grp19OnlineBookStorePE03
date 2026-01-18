@@ -1,0 +1,92 @@
+﻿@page "/checkout"
+@rendermode InteractiveServer
+
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Grp19OnlineBookStorePE03.Classes
+@using Grp19OnlineBookStorePE03.Data
+
+@inject IDbContextFactory<Grp19OnlineBookStorePE03Context> DbFactory
+@inject AuthenticationStateProvider AuthStateProvider
+@inject UserManager<OnlineBookStoreUser> UserManager
+
+@attribute [Authorize(Roles = "User,Admin")]
+
+<h1>Checkout</h1>
+
+@if (cartItems == null)
+{
+    <p>Loading...</p>
+}
+else if (!cartItems.Any())
+{
+    <p>Your cart is empty.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in cartItems)
+            {
+                <tr>
+                    <td>
+                        @(item.Book != null ? item.Book.BookName : item.Misc!.MiscName)
+                    </td>
+                    <td>@item.Quantity</td>
+                    <td>
+                        $@(item.Book != null ? item.Book.Price : item.Misc!.Price)
+                    </td>
+                    <td>
+                        $@(
+                        item.Quantity *
+                        (item.Book != null ? item.Book.Price : item.Misc!.Price)
+                                )
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h3>Total: $@TotalPrice</h3>
+
+    <button class="btn btn-success" disabled>
+        PAY NOW (Coming next)
+    </button>
+}
+@code{
+    private Grp19OnlineBookStorePE03Context context = default!;
+private List<CartItem>? cartItems;
+private string userId = "";
+
+protected override async Task OnInitializedAsync()
+{
+    context = DbFactory.CreateDbContext();
+
+    var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+    var user = authState.User;
+    userId = UserManager.GetUserId(user)!;
+
+    cartItems = await context.CartItem
+        .Include(c => c.Book)
+        .Include(c => c.Misc)
+        .Where(c => c.UserId == userId)
+        .ToListAsync();
+}
+
+private decimal TotalPrice =>
+    cartItems?.Sum(c =>
+        c.Quantity *
+        (c.Book != null ? c.Book.Price : c.Misc!.Price)
+    ) ?? 0;
+
+}

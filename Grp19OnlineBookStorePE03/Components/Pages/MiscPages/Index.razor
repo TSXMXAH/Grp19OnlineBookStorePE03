@@ -1,11 +1,66 @@
 ﻿@page "/miscs"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using Grp19OnlineBookStorePE03.Classes
 @using Grp19OnlineBookStorePE03.Data
 @implements IAsyncDisposable
 @inject IDbContextFactory<Grp19OnlineBookStorePE03.Data.Grp19OnlineBookStorePE03Context> DbFactory
+@inject AuthenticationStateProvider AuthStateProvider
+@inject UserManager<OnlineBookStoreUser> UserManager
 @attribute [Authorize(Roles = "Admin, User")]
+
+<style>
+    .misc-list {
+        width: 90%;
+        margin: 40px auto;
+    }
+
+    .misc-item {
+        display: flex;
+        justify-content: space-between;
+        background: white;
+        padding: 20px;
+        margin-bottom: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .misc-info {
+        width: 55%;
+        line-height: 1.6;
+    }
+
+    .misc-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        justify-content: center;
+        min-width: 160px;
+    }
+
+    .btn {
+        background: red;
+        color: white;
+        border: none;
+        padding: 10px;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+        .btn.secondary {
+            background: #555;
+        }
+
+        .btn.outline {
+            background: white;
+            color: red;
+            border: 2px solid red;
+        }
+</style>
 
 <PageTitle>Index</PageTitle>
 
@@ -15,27 +70,114 @@
     <a href="miscs/create">Create New</a>
 </p>
 </AuthorizeView>
-<QuickGrid Class="table" Items="context.Misc">
-    <PropertyColumn Property="misc => misc.MiscName" />
-    <PropertyColumn Property="misc => misc.Category" />
-    <PropertyColumn Property="misc => misc.Price" />
-    <PropertyColumn Property="misc => misc.StaffId" />
+<div class="misc-list">
 
-    <TemplateColumn Context="misc">
-        <a href="@($"miscs/details?id={misc.Id}")">Details</a>
-        <AuthorizeView Roles="Admin">
-        | <a href="@($"miscs/edit?id={misc.Id}")">Edit</a> |
-          <a href="@($"miscs/delete?id={misc.Id}")">Delete</a>
-        </AuthorizeView>
-    </TemplateColumn>
-</QuickGrid>
+    @if (miscs == null)
+    {
+        <p>Loading items...</p>
+    }
+    else if (!miscs.Any())
+    {
+        <p>No miscellaneous items available.</p>
+    }
+    else
+    {
+        @foreach (var misc in miscs)
+        {
+            <div class="misc-item">
+
+                <div class="misc-info">
+                    <strong>@misc.MiscName</strong><br />
+                    Category: @misc.Category<br />
+                    Price: $@misc.Price
+                </div>
+
+                <div class="misc-buttons">
+
+                    <button class="btn"
+                            @onclick="() => AddMiscToCart(misc.Id)">
+                        ADD TO CART
+                    </button>
+
+                    <button class="btn secondary"
+                            @onclick="() => AddMiscToWishlist(misc.Id)">
+                        WISHLIST
+                    </button>
+
+                    <a class="btn outline"
+                       href="@($"miscs/details?id={misc.Id}")">
+                        DETAILS
+                    </a>
+
+                    <AuthorizeView Roles="Admin">
+                        <a href="@($"miscs/edit?id={misc.Id}")">Edit</a>
+                        <a href="@($"miscs/delete?id={misc.Id}")">Delete</a>
+                    </AuthorizeView>
+
+                </div>
+
+            </div>
+        }
+    }
+</div>
+
 
 @code {
     private Grp19OnlineBookStorePE03Context context = default!;
+    private List<Misc>? miscs;
+    private string userId = "";
 
-    protected override void OnInitialized()
+
+    protected override async Task OnInitializedAsync()
     {
         context = DbFactory.CreateDbContext();
+
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        userId = UserManager.GetUserId(user)!;
+
+        miscs = await context.Misc.ToListAsync();
+    }
+    private async Task AddMiscToCart(int miscId)
+    {
+        var item = await context.CartItem
+            .FirstOrDefaultAsync(c => c.MiscId == miscId && c.UserId == userId);
+
+        if (item != null)
+        {
+            item.Quantity++;
+        }
+        else
+        {
+            context.CartItem.Add(new CartItem
+            {
+                MiscId = miscId,
+                UserId = userId,
+                Quantity = 1
+            });
+        }
+
+        await context.SaveChangesAsync();
+    }
+    private async Task AddMiscToWishlist(int miscId)
+    {
+        var userId = UserManager.GetUserId(
+            (await AuthStateProvider.GetAuthenticationStateAsync()).User
+        )!;
+
+        bool exists = await context.WishlistItem
+            .AnyAsync(w => w.MiscId == miscId && w.UserId == userId);
+
+        if (exists) return;
+
+        context.WishlistItem.Add(new WishlistItem
+        {
+            MiscId = miscId,
+            UserId = userId,
+            BookId = null
+        });
+
+        await context.SaveChangesAsync();
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

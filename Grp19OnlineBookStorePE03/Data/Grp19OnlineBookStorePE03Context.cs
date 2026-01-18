@@ -17,10 +17,23 @@ namespace Grp19OnlineBookStorePE03.Data
         public DbSet<Grp19OnlineBookStorePE03.Classes.OrderItem> OrderItem { get; set; } = default!;
         public DbSet<Grp19OnlineBookStorePE03.Classes.Payment> Payment { get; set; } = default!;
         public DbSet<Grp19OnlineBookStorePE03.Classes.BookStock> BookStock { get; set; } = default!;
+        public DbSet<Grp19OnlineBookStorePE03.Classes.CartItem> CartItem{ get; set; } = default!;
+        public DbSet<Grp19OnlineBookStorePE03.Classes.WishlistItem> WishlistItem { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.Entity<WishlistItem>()
+                .HasOne(w => w.Book)
+                .WithMany()
+                .HasForeignKey(w => w.BookId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<WishlistItem>()
+                .HasOne(w => w.Misc)
+                .WithMany()
+                .HasForeignKey(w => w.MiscId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.ApplyConfiguration(new StaffSeed());
             builder.ApplyConfiguration(new BookSeed());

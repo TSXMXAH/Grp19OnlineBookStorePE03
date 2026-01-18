@@ -1,14 +1,21 @@
-﻿    @page "/books"
+@page "/books"
+@rendermode InteractiveServer
 
-    @using Microsoft.AspNetCore.Authorization
-    @using Microsoft.EntityFrameworkCore
-    @using Grp19OnlineBookStorePE03.Classes
-    @using Grp19OnlineBookStorePE03.Data
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.CodeAnalysis.Elfie.Diagnostics
+@using Microsoft.EntityFrameworkCore
+@using Grp19OnlineBookStorePE03.Classes
+@using Grp19OnlineBookStorePE03.Data
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.Extensions.Logging
 
-    @implements IAsyncDisposable
-    @inject IDbContextFactory<Grp19OnlineBookStorePE03Context> DbFactory
-
-    @attribute [Authorize(Roles = "Admin, User")]
+@implements IAsyncDisposable
+@inject IDbContextFactory<Grp19OnlineBookStorePE03Context> DbFactory
+@inject AuthenticationStateProvider AuthStateProvider
+@inject UserManager<OnlineBookStoreUser> UserManager
+@inject ILogger<Book> Logger
+@attribute [Authorize(Roles = "Admin, User")]
 
     <PageTitle>Books</PageTitle>
 
@@ -150,17 +157,76 @@
 
         // ---------------- USER ACTIONS (STUBS) ----------------
 
-        private void AddToCart(int bookId)
+    private async Task AddToCart(int bookId)
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (!user.Identity?.IsAuthenticated ?? true)
         {
-            // TODO: Implement cart logic
-            Console.WriteLine($"Book {bookId} added to cart");
+            Logger.LogWarning("User not logged in");
+            return;
         }
 
-        private void AddToWishlist(int bookId)
+        var userId = UserManager.GetUserId(user)!;
+
+        var existingItem = await context.CartItem
+            .FirstOrDefaultAsync(c => c.BookId == bookId && c.UserId == userId);
+
+        if (existingItem != null)
         {
-            // TODO: Implement wishlist logic
-            Console.WriteLine($"Book {bookId} added to wishlist");
+            existingItem.Quantity += 1;
+            Logger.LogInformation("Quantity increased for BookId {BookId}", bookId);
         }
+        else
+        {
+            context.CartItem.Add(new CartItem
+            {
+                BookId = bookId,
+                UserId = userId,
+                Quantity = 1
+            });
+
+            Logger.LogInformation("New cart item added for BookId {BookId}", bookId);
+        }
+
+        await context.SaveChangesAsync();
+    }
+
+    private async Task AddToWishlist(int bookId)
+    {
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (!user.Identity?.IsAuthenticated ?? true)
+                return;
+
+            var userId = UserManager.GetUserId(user)!;
+
+            // Prevent duplicates
+            bool exists = await context.WishlistItem.AnyAsync(w =>
+                w.UserId == userId && w.BookId == bookId);
+
+            if (exists)
+                return;
+
+            context.WishlistItem.Add(new WishlistItem
+            {
+                UserId = userId,
+                BookId = bookId, 
+                MiscId = null
+            });
+
+            await context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error adding book {BookId} to wishlist", bookId);
+            throw;
+        }
+    }
 
         public async ValueTask DisposeAsync()
             => await context.DisposeAsync();
