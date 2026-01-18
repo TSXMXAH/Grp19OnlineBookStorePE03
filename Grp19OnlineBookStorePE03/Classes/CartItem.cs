@@ -6,8 +6,13 @@ namespace Grp19OnlineBookStorePE03.Classes
     {
         public int CartItemId { get; set; }
         public string UserId { get; set; } = string.Empty;
-        public int BookId { get; set; }
+
+        public int? BookId { get; set; }
         public Book? Book { get; set; }
+
+        public int? MiscId { get; set; }
+        public Misc? Misc { get; set; }
+
         public int Quantity { get; set; } = 1;
     }
 }

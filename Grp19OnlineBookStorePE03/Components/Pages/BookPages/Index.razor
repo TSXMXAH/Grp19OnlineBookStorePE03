@@ -188,31 +188,39 @@
         await context.SaveChangesAsync();
     }
 
-
-
     private async Task AddToWishlist(int bookId)
     {
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        if (!user.Identity?.IsAuthenticated ?? true)
-            return;
-
-        var userId = UserManager.GetUserId(user)!;
-
-        bool exists = await context.WishlistItem
-            .AnyAsync(w => w.BookId == bookId && w.UserId == userId);
-
-        if (exists)
-            return;
-
-        context.WishlistItem.Add(new WishlistItem
+        try
         {
-            BookId = bookId,
-            UserId = userId
-        });
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
 
-        await context.SaveChangesAsync();
+            if (!user.Identity?.IsAuthenticated ?? true)
+                return;
+
+            var userId = UserManager.GetUserId(user)!;
+
+            // Prevent duplicates
+            bool exists = await context.WishlistItem.AnyAsync(w =>
+                w.UserId == userId && w.BookId == bookId);
+
+            if (exists)
+                return;
+
+            context.WishlistItem.Add(new WishlistItem
+            {
+                UserId = userId,
+                BookId = bookId, 
+                MiscId = null
+            });
+
+            await context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error adding book {BookId} to wishlist", bookId);
+            throw;
+        }
     }
 
     public async ValueTask DisposeAsync()

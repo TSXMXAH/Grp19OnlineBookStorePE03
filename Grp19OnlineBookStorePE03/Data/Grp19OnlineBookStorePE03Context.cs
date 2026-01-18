@@ -1,7 +1,9 @@
-﻿using Grp19OnlineBookStorePE03.Config.Entities;
+﻿using Grp19OnlineBookStorePE03.Classes;
+using Grp19OnlineBookStorePE03.Config.Entities;
 using Grp19OnlineBookStorePE03.Data;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace Grp19OnlineBookStorePE03.Data
 {
@@ -20,6 +22,17 @@ namespace Grp19OnlineBookStorePE03.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.Entity<WishlistItem>()
+                .HasOne(w => w.Book)
+                .WithMany()
+                .HasForeignKey(w => w.BookId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<WishlistItem>()
+                .HasOne(w => w.Misc)
+                .WithMany()
+                .HasForeignKey(w => w.MiscId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.ApplyConfiguration(new StaffSeed());
             builder.ApplyConfiguration(new BookSeed());

@@ -93,26 +93,43 @@ else
         @foreach (var item in items)
         {
             <div class="wishlist-card">
+
                 <div class="wishlist-cover">
-                    Book Cover
+                    @(item.Book != null ? "Book Cover" : "Misc Item")
                 </div>
+
                 <div class="wishlist-info">
-                    <h3>@item.Book?.BookName</h3>
-                    <p><strong>Author:</strong> @item.Book?.Author</p>
-                    <p><strong>Category:</strong> @item.Book?.Category</p>
-                    <p class="price">$@item.Book?.Price</p>
+                    @if (item.Book != null)
+                    {
+                        <h3>@item.Book.BookName</h3>
+                        <p><strong>Author:</strong> @item.Book.Author</p>
+                        <p><strong>Category:</strong> @item.Book.Category</p>
+                        <p class="price">$@item.Book.Price</p>
+                    }
+                    else if (item.Misc != null)
+                    {
+                        <h3>@item.Misc.MiscName</h3>
+                        <p><strong>Category:</strong> @item.Misc.Category</p>
+                        <p class="price">$@item.Misc.Price</p>
+                    }
+
                 </div>
             </div>
+
             <div class="wishlist-actions">
-                <button class="btn" @onclick="() => MoveToCart(item.WishlistItemId)">
+                <button class="btn"
+                        @onclick="() => MoveToCart(item.WishlistItemId)">
                     ADD TO CART
                 </button>
-                <button class="btn outline" @onclick="() => Remove(item.WishlistItemId)">
+
+                <button class="btn outline"
+                        @onclick="() => Remove(item.WishlistItemId)">
                     REMOVE
                 </button>
             </div>
         }
     </div>
+
 }
 
 @code {
@@ -120,6 +137,7 @@ else
     private List<WishlistItem> wishlistItems = new();
     private string userId = "";  
     private List<WishlistItem>? items;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -130,6 +148,7 @@ else
 
         items = await context.WishlistItem
             .Include(w => w.Book)
+            .Include(w => w.Misc)
             .Where(w => w.UserId == userId)
             .ToListAsync();
     }
@@ -148,6 +167,7 @@ else
     {
         wishlistItems = await context.WishlistItem
             .Include(w => w.Book)
+            .Include(w => w.Misc)
             .Where(w => w.UserId == userId)
             .ToListAsync();
     }

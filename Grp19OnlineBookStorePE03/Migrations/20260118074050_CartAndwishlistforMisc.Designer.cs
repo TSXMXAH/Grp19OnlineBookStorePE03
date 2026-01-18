@@ -4,6 +4,7 @@ using Grp19OnlineBookStorePE03.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Grp19OnlineBookStorePE03.Migrations
 {
     [DbContext(typeof(Grp19OnlineBookStorePE03Context))]
-    partial class Grp19OnlineBookStorePE03ContextModelSnapshot : ModelSnapshot
+    [Migration("20260118074050_CartAndwishlistforMisc")]
+    partial class CartAndwishlistforMisc
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -328,10 +331,10 @@ namespace Grp19OnlineBookStorePE03.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WishlistItemId"));
 
-                    b.Property<int?>("BookId")
+                    b.Property<int>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("MiscId")
+                    b.Property<int>("MiscId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
@@ -422,7 +425,7 @@ namespace Grp19OnlineBookStorePE03.Migrations
                         {
                             Id = "c1a2b3c4-d5e6-4789-8901-234567890abc",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "5a87ea7d-dca6-4d17-b7c7-f11d29b9ff70",
+                            ConcurrencyStamp = "adaf6dee-22d8-4229-a067-5bf953043ade",
                             Email = "admin@localhost.com",
                             EmailConfirmed = true,
                             FirstName = "Admin",
@@ -430,9 +433,9 @@ namespace Grp19OnlineBookStorePE03.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@LOCALHOST.COM",
                             NormalizedUserName = "ADMIN@LOCALHOST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHhvz6GvG3//DNekSw8Td7a/AayAhONpPNZUhyEpfEgFmMwwH1CLo/6I0g63SVrM3g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDgDcPD6F8HYuQxmyHoZn446R26Mm/iU1jhSxEJOSUdWN9rgFuWHHEyekLU17w6CbQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "4c8efe82-594b-4d33-ba4e-33ba89c7a324",
+                            SecurityStamp = "134b3b40-a73b-4ffb-ba8a-221687d52b96",
                             TwoFactorEnabled = false,
                             UserName = "admin@localhost.com"
                         });
@@ -677,12 +680,14 @@ namespace Grp19OnlineBookStorePE03.Migrations
                     b.HasOne("Grp19OnlineBookStorePE03.Classes.Book", "Book")
                         .WithMany()
                         .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Grp19OnlineBookStorePE03.Classes.Misc", "Misc")
                         .WithMany()
                         .HasForeignKey("MiscId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Book");
 
