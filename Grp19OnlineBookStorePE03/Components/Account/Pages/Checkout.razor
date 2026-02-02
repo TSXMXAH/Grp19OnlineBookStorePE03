@@ -51,9 +51,9 @@ else
 
     <h3>Total: $@TotalPrice</h3>
 
-    @if (paymentMessage != null)
+    @if (!string.IsNullOrEmpty(paymentMessage))
     {
-        <div class="alert alert-success">@paymentMessage</div>
+        <div class="alert alert-info">@paymentMessage</div>
     }
 
     <button class="btn btn-success" @onclick="PayNow" disabled="@isProcessing">
@@ -74,8 +74,14 @@ else
 
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        userId = UserManager.GetUserId(user)!;
 
+        if (user.Identity?.IsAuthenticated != true)
+        {
+            NavigationManager.NavigateTo("/account/login");
+            return;
+        }
+
+        userId = UserManager.GetUserId(user)!;
         await LoadCart();
     }
 
@@ -99,23 +105,60 @@ else
             return;
 
         isProcessing = true;
+        paymentMessage = null;
 
-        // Create payment record
-        var payment = new Payment
+        await using var transaction = await context.Database.BeginTransactionAsync();
+
+        try
         {
-            UserId = userId,
-            AmountPaid = TotalPrice,
-            PaymentDate = DateTime.UtcNow
-        };
-        context.Payment.Add(payment);
+ 
+            var customer = await context.Customer.FirstOrDefaultAsync();
+            if (customer == null)
+            {
+                paymentMessage = "Payment failed: no customer record exists.";
+                isProcessing = false;
+                return;
+            }
 
-        // Remove cart items
-        context.CartItem.RemoveRange(cartItems);
+            // Create Order
+            var order = new Order
+            {
+                CustomerId = customer.Id,
+                OrderDate = DateTime.UtcNow,
+                OrderStatus = "Paid"
+            };
 
-        await context.SaveChangesAsync();
+            context.Order.Add(order);
+            await context.SaveChangesAsync(); // get Order.Id
 
-        paymentMessage = $"Payment of ${TotalPrice} successful! Thank you for your purchase.";
-        cartItems.Clear();
-        isProcessing = false;
+            // Create Payment linked to Order
+            var payment = new Payment
+            {
+                OrderId = order.Id,     // FK
+                AmountPaid = TotalPrice,
+                PaymentDate = DateTime.UtcNow
+            };
+
+            context.Payment.Add(payment);
+
+            // Clear cart
+            context.CartItem.RemoveRange(cartItems);
+
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            paymentMessage = $"Payment of ${TotalPrice} successful! Thank you for your purchase.";
+            cartItems.Clear();
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            paymentMessage = $"Payment failed: {ex.InnerException?.Message ?? ex.Message}";
+            Console.Error.WriteLine(ex);
+        }
+        finally
+        {
+            isProcessing = false;
+        }
     }
 }

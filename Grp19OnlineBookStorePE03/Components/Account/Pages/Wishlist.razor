@@ -96,9 +96,16 @@ else
 
                 <div class="wishlist-cover">
                     <!--@* @(item.Book != null ? "Book Cover" : "Misc Item") *@-->
-                     <a href="@item.Book.CoverUrl" target="_blank">
+                    @if (item.Book != null)
+                    {
+                        <a href="@item.Book.CoverUrl" target="_blank">
                             <img src="@item.Book.CoverUrl" alt="Cover for @item.Book.Title" />
                         </a>
+                    }
+                    else
+                    {
+                        <span>No Image</span>
+                    }
                 </div>
 
                 <div class="wishlist-info">
@@ -147,7 +154,9 @@ else
         context = DbFactory.CreateDbContext();
 
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var userId = UserManager.GetUserId(authState.User)!;
+        var currentUser = authState.User;
+
+        userId = UserManager.GetUserId(currentUser)!; 
 
         items = await context.WishlistItem
             .Include(w => w.Book)
