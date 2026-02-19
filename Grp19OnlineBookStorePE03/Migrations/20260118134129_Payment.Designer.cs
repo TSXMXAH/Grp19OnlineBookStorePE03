@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Grp19OnlineBookStorePE03.Migrations
 {
     [DbContext(typeof(Grp19OnlineBookStorePE03Context))]
-    [Migration("20260118074050_CartAndwishlistforMisc")]
-    partial class CartAndwishlistforMisc
+    [Migration("20260118134129_Payment")]
+    partial class Payment
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,17 +36,29 @@ namespace Grp19OnlineBookStorePE03.Migrations
                     b.Property<string>("Author")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("BookName")
+                    b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Category")
+                    b.Property<string>("CoverUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ISBN")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OpenLibraryWorkKey")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("PublishYear")
+                        .HasColumnType("int");
+
                     b.Property<int>("StaffId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -59,28 +71,73 @@ namespace Grp19OnlineBookStorePE03.Migrations
                         {
                             Id = 1,
                             Author = "Holly Black",
-                            BookName = "The Cruel Prince",
                             Category = "Romance",
                             Price = 17.20m,
-                            StaffId = 1
+                            PublishYear = 0,
+                            StaffId = 1,
+                            Title = "The Cruel Prince"
                         },
                         new
                         {
                             Id = 2,
                             Author = "Vince Elson",
-                            BookName = "The Laughing King",
                             Category = "Comedy",
                             Price = 18.50m,
-                            StaffId = 1
+                            PublishYear = 0,
+                            StaffId = 1,
+                            Title = "The Laughing King"
                         },
                         new
                         {
                             Id = 3,
                             Author = "Holly Black",
-                            BookName = "The Queen Of Nothing",
                             Category = "Romance",
                             Price = 16.50m,
-                            StaffId = 1
+                            PublishYear = 0,
+                            StaffId = 1,
+                            Title = "The Queen Of Nothing"
+                        });
+                });
+
+            modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.BookStock", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId")
+                        .IsUnique();
+
+                    b.ToTable("BookStock");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            BookId = 1,
+                            Quantity = 5
+                        },
+                        new
+                        {
+                            Id = 2,
+                            BookId = 2,
+                            Quantity = 3
+                        },
+                        new
+                        {
+                            Id = 3,
+                            BookId = 3,
+                            Quantity = 7
                         });
                 });
 
@@ -282,6 +339,9 @@ namespace Grp19OnlineBookStorePE03.Migrations
                     b.Property<DateTime>("PaymentDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId")
@@ -331,10 +391,10 @@ namespace Grp19OnlineBookStorePE03.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WishlistItemId"));
 
-                    b.Property<int>("BookId")
+                    b.Property<int?>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<int>("MiscId")
+                    b.Property<int?>("MiscId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
@@ -425,7 +485,7 @@ namespace Grp19OnlineBookStorePE03.Migrations
                         {
                             Id = "c1a2b3c4-d5e6-4789-8901-234567890abc",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "adaf6dee-22d8-4229-a067-5bf953043ade",
+                            ConcurrencyStamp = "bcfaad18-183e-4a74-a6e4-fce9b40fcb0f",
                             Email = "admin@localhost.com",
                             EmailConfirmed = true,
                             FirstName = "Admin",
@@ -433,9 +493,9 @@ namespace Grp19OnlineBookStorePE03.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@LOCALHOST.COM",
                             NormalizedUserName = "ADMIN@LOCALHOST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDgDcPD6F8HYuQxmyHoZn446R26Mm/iU1jhSxEJOSUdWN9rgFuWHHEyekLU17w6CbQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBE+bvELwNxH819rQH9nuHwlKiO/DYVltgNl3Q2G4svh5hIxLEpY3nGTvmn2v5DNyQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "134b3b40-a73b-4ffb-ba8a-221687d52b96",
+                            SecurityStamp = "cb9c3d24-1b43-4c13-a09a-7bd6847db4f8",
                             TwoFactorEnabled = false,
                             UserName = "admin@localhost.com"
                         });
@@ -606,6 +666,17 @@ namespace Grp19OnlineBookStorePE03.Migrations
                     b.Navigation("Staff");
                 });
 
+            modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.BookStock", b =>
+                {
+                    b.HasOne("Grp19OnlineBookStorePE03.Classes.Book", "Book")
+                        .WithOne("BookStock")
+                        .HasForeignKey("Grp19OnlineBookStorePE03.Classes.BookStock", "BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+                });
+
             modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.CartItem", b =>
                 {
                     b.HasOne("Grp19OnlineBookStorePE03.Classes.Book", "Book")
@@ -680,14 +751,12 @@ namespace Grp19OnlineBookStorePE03.Migrations
                     b.HasOne("Grp19OnlineBookStorePE03.Classes.Book", "Book")
                         .WithMany()
                         .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Grp19OnlineBookStorePE03.Classes.Misc", "Misc")
                         .WithMany()
                         .HasForeignKey("MiscId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Book");
 
@@ -743,6 +812,11 @@ namespace Grp19OnlineBookStorePE03.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.Book", b =>
+                {
+                    b.Navigation("BookStock");
                 });
 
             modelBuilder.Entity("Grp19OnlineBookStorePE03.Classes.Customer", b =>

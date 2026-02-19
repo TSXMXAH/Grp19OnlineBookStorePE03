@@ -18,9 +18,9 @@
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
-                <label for="bookname" class="form-label">BookName:</label> 
-                <InputText id="bookname" @bind-Value="Book.BookName" class="form-control" /> 
-                <ValidationMessage For="() => Book.BookName" class="text-danger" /> 
+                <label for="bookname" class="form-label">Title:</label> 
+                <InputText id="bookname" @bind-Value="Book.Title" class="form-control" /> 
+                <ValidationMessage For="() => Book.Title" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="author" class="form-label">Author:</label> 
@@ -40,7 +40,7 @@
             <div class="mb-3">
                 <label for="staffid" class="form-label">StaffId:</label> 
                 <InputNumber id="staffid" @bind-Value="Book.StaffId" class="form-control" /> 
-                <ValidationMessage For="() => Book.StaffId" class="text-danger" /> 
+                <Create />ValidationMessage For="() => Book.StaffId" class="text-danger" />
             </div>        
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>

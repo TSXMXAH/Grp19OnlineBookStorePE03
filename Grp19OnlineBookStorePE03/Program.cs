@@ -5,6 +5,7 @@ using Grp19OnlineBookStorePE03.Data;
 using Grp19OnlineBookStorePE03.Components.Account;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Grp19OnlineBookStorePE03.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContextFactory<Grp19OnlineBookStorePE03Context>(options =>
@@ -13,6 +14,9 @@ builder.Services.AddDbContextFactory<Grp19OnlineBookStorePE03Context>(options =>
 builder.Services.AddQuickGridEntityFrameworkAdapter();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+// Add the API into the code
+builder.Services.AddHttpClient<OpenLibraryService>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
